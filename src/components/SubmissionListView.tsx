@@ -411,7 +411,7 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
           )}
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 50]}
+          rowsPerPageOptions={[2, 5, 10, 25]}
           component="div"
           count={total}
           rowsPerPage={pageSize}
