@@ -10,7 +10,6 @@ import {
   Checkbox,
   Chip,
   CircularProgress,
-  FormControl,
   FormControlLabel,
   IconButton,
   InputAdornment,
@@ -30,61 +29,16 @@ import {
 } from "@mui/material";
 import { FC, ReactNode, useEffect, useState } from "react";
 import { useSubmissions } from "../hooks/useSubmissions";
-import { ColumnDefinition, FormSubmission } from "../types/form";
+import { ColumnDefinition, TableData } from "../types/form";
 
 interface SubmissionListViewProps {
-  initialColumns?: ColumnDefinition[];
+  initialVisibleColumns?: string[];
 }
 
-const DEFAULT_COLUMNS: ColumnDefinition[] = [
-  { id: "id", label: "ID", accessor: "id", sortable: true },
-  {
-    id: "applicantName",
-    label: "Applicant Name",
-    accessor: "applicantName",
-    sortable: true,
-    filterable: true,
-  },
-  {
-    id: "type",
-    label: "Insurance Type",
-    accessor: "type",
-    sortable: true,
-    filterable: true,
-  },
-  {
-    id: "applicantAge",
-    label: "Age",
-    accessor: "applicantAge",
-    sortable: true,
-  },
-  {
-    id: "city",
-    label: "City",
-    accessor: "city",
-    sortable: true,
-    filterable: true,
-  },
-  {
-    id: "status",
-    label: "Status",
-    accessor: "status",
-    sortable: true,
-    filterable: true,
-  },
-  {
-    id: "submittedAt",
-    label: "Submitted At",
-    accessor: "submittedAt",
-    sortable: true,
-  },
-];
-
 export const SubmissionListView: FC<SubmissionListViewProps> = ({
-  initialColumns = DEFAULT_COLUMNS,
+  initialVisibleColumns,
 }) => {
-  const [visibleColumns, setVisibleColumns] =
-    useState<ColumnDefinition[]>(initialColumns);
+  const [visibleColumnIds, setVisibleColumnIds] = useState<string[]>([]);
   const [columnMenuAnchor, setColumnMenuAnchor] = useState<null | HTMLElement>(
     null
   );
@@ -97,6 +51,7 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
   const {
     submissions,
     total,
+    columns,
     currentPage,
     pageSize,
     sort,
@@ -114,6 +69,18 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
     initialOrder: "desc",
   });
 
+  // Initialize visible columns when API data is loaded
+  useEffect(() => {
+    if (columns.length > 0 && visibleColumnIds.length === 0) {
+      if (initialVisibleColumns) {
+        setVisibleColumnIds(initialVisibleColumns);
+      } else {
+        // By default, show all columns
+        setVisibleColumnIds(columns.map((col) => col.id));
+      }
+    }
+  }, [columns, initialVisibleColumns, visibleColumnIds.length]);
+
   // Apply search filter
   useEffect(() => {
     if (searchText && filterField) {
@@ -121,7 +88,7 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
     } else if (!searchText && Object.keys(filter).length > 0) {
       handleFilterChange({});
     }
-  }, [searchText, filterField]);
+  }, [searchText, filterField, handleFilterChange]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
@@ -132,15 +99,15 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
     setFilterField(null);
   };
 
-  const handleColumnToggle = (column: ColumnDefinition) => {
-    const isVisible = visibleColumns.some((col) => col.id === column.id);
+  const handleColumnToggle = (columnId: string) => {
+    const isVisible = visibleColumnIds.includes(columnId);
     if (isVisible) {
       // Don't remove if it's the last column
-      if (visibleColumns.length > 1) {
-        setVisibleColumns(visibleColumns.filter((col) => col.id !== column.id));
+      if (visibleColumnIds.length > 1) {
+        setVisibleColumnIds(visibleColumnIds.filter((id) => id !== columnId));
       }
     } else {
-      setVisibleColumns([...visibleColumns, column]);
+      setVisibleColumnIds([...visibleColumnIds, columnId]);
     }
   };
 
@@ -165,37 +132,48 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
     setFilterMenuAnchor(null);
   };
 
-  const getStatusChipColor = (status: string) => {
-    switch (status) {
-      case "Approved":
-        return "success";
-      case "Rejected":
-        return "error";
-      case "Pending":
-      default:
-        return "warning";
-    }
-  };
-
   const renderCellContent = (
-    submission: FormSubmission,
+    submission: TableData,
     column: ColumnDefinition
   ): ReactNode => {
     const value = submission[column.accessor];
 
     // Format specific columns
-    if (column.id === "status" && typeof value === "string") {
+    if (column.accessor === "Insurance Type" || column.accessor === "Status") {
       return (
-        <Chip label={value} color={getStatusChipColor(value)} size="small" />
+        <Chip
+          label={value}
+          color={
+            value === "Health"
+              ? "info"
+              : value === "Home"
+              ? "success"
+              : value === "Car"
+              ? "warning"
+              : value === "Approved"
+              ? "success"
+              : value === "Rejected"
+              ? "error"
+              : value === "Pending"
+              ? "warning"
+              : "default"
+          }
+          size="small"
+        />
       );
     }
 
-    if (column.id === "submittedAt" && typeof value === "string") {
-      return (
-        new Date(value).toLocaleDateString() +
-        " " +
-        new Date(value).toLocaleTimeString()
-      );
+    // Format date columns if they look like dates
+    if (typeof value === "string" && value.match(/^\d{4}-\d{2}-\d{2}/)) {
+      try {
+        return (
+          new Date(value).toLocaleDateString() +
+          " " +
+          new Date(value).toLocaleTimeString()
+        );
+      } catch {
+        return value;
+      }
     }
 
     if (typeof value === "object") {
@@ -215,11 +193,9 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
     handleLimitChange(parseInt(event.target.value, 10));
   };
 
-  // Sort columns based on the order they appear in DEFAULT_COLUMNS for consistent display
-  const sortedVisibleColumns = visibleColumns.sort(
-    (a, b) =>
-      DEFAULT_COLUMNS.findIndex((col) => col.id === a.id) -
-      DEFAULT_COLUMNS.findIndex((col) => col.id === b.id)
+  // Get only the visible columns in their original order
+  const visibleColumns = columns.filter((col) =>
+    visibleColumnIds.includes(col.id)
   );
 
   if (error) {
@@ -248,154 +224,191 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
             }}
           >
             <Typography variant="h5" component="h2">
-              Insurance Applications
+              Submissions
             </Typography>
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <IconButton
+            <Box>
+              <Button
+                startIcon={<FilterListIcon />}
                 onClick={handleFilterMenuOpen}
-                aria-label="filter list"
+                sx={{ ml: 1 }}
               >
-                <FilterListIcon />
-              </IconButton>
-              <IconButton
+                Filter
+              </Button>
+              <Button
+                startIcon={<ViewColumnIcon />}
                 onClick={handleColumnMenuOpen}
-                aria-label="select columns"
+                sx={{ ml: 1 }}
               >
-                <ViewColumnIcon />
-              </IconButton>
+                Columns
+              </Button>
             </Box>
           </Box>
 
-          {/* Filter Menu */}
-          <Menu
-            anchorEl={filterMenuAnchor}
-            open={Boolean(filterMenuAnchor)}
-            onClose={handleFilterMenuClose}
-          >
-            {DEFAULT_COLUMNS.filter((col) => col.filterable).map((column) => (
-              <MenuItem
-                key={column.id}
-                onClick={() => handleFilterSelect(column)}
-              >
-                {column.label}
-              </MenuItem>
-            ))}
-          </Menu>
-
-          {/* Column Selection Menu */}
-          <Menu
-            anchorEl={columnMenuAnchor}
-            open={Boolean(columnMenuAnchor)}
-            onClose={handleColumnMenuClose}
-          >
-            {DEFAULT_COLUMNS.map((column) => (
-              <MenuItem key={column.id}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={visibleColumns.some(
-                        (col) => col.id === column.id
-                      )}
-                      onChange={() => handleColumnToggle(column)}
-                    />
-                  }
-                  label={column.label}
-                />
-              </MenuItem>
-            ))}
-          </Menu>
-
-          {/* Search Box */}
-          {filterField && (
-            <FormControl
-              fullWidth
+          <Box sx={{ mb: 2 }}>
+            <TextField
+              label="Search"
               variant="outlined"
-              size="small"
-              sx={{ mb: 2 }}
-            >
-              <TextField
-                value={searchText}
-                onChange={handleSearchChange}
-                placeholder={`Search by ${
-                  DEFAULT_COLUMNS.find((col) => col.accessor === filterField)
-                    ?.label || "value"
-                }`}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                  endAdornment: searchText && (
-                    <InputAdornment position="end">
-                      <IconButton edge="end" onClick={clearSearch} size="small">
-                        <CloseIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
+              fullWidth
+              value={searchText}
+              onChange={handleSearchChange}
+              disabled={!filterField}
+              placeholder={
+                filterField
+                  ? `Search by ${filterField}...`
+                  : "Select a field to search"
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                endAdornment: searchText ? (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="clear search"
+                      onClick={clearSearch}
+                      edge="end"
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ) : null,
+              }}
+            />
+          </Box>
+
+          {Object.keys(filter).length > 0 && (
+            <Box sx={{ mb: 2 }}>
+              <Typography component="span" sx={{ mr: 1 }}>
+                Active filters:
+              </Typography>
+              {Object.entries(filter).map(([key, value]) => (
+                <Chip
+                  key={key}
+                  label={`${key}: ${value}`}
+                  onDelete={() => {
+                    const newFilter = { ...filter };
+                    delete newFilter[key];
+                    handleFilterChange(newFilter);
+                    if (key === filterField) {
+                      setSearchText("");
+                      setFilterField(null);
+                    }
+                  }}
+                  sx={{ mr: 0.5 }}
+                />
+              ))}
+              <Chip
+                label="Clear All"
+                onDelete={() => {
+                  handleFilterChange({});
+                  setSearchText("");
+                  setFilterField(null);
                 }}
+                sx={{ mr: 0.5 }}
               />
-            </FormControl>
+            </Box>
           )}
         </CardContent>
       </Card>
 
+      <Menu
+        anchorEl={columnMenuAnchor}
+        open={Boolean(columnMenuAnchor)}
+        onClose={handleColumnMenuClose}
+      >
+        {columns.map((column) => (
+          <MenuItem key={column.id}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={visibleColumnIds.includes(column.id)}
+                  onChange={() => handleColumnToggle(column.id)}
+                />
+              }
+              label={column.label}
+            />
+          </MenuItem>
+        ))}
+      </Menu>
+
+      <Menu
+        anchorEl={filterMenuAnchor}
+        open={Boolean(filterMenuAnchor)}
+        onClose={handleFilterMenuClose}
+      >
+        {columns
+          .filter((column) => column.filterable)
+          .map((column) => (
+            <MenuItem
+              key={column.id}
+              onClick={() => handleFilterSelect(column)}
+            >
+              {column.label}
+            </MenuItem>
+          ))}
+      </Menu>
+
       <Paper sx={{ width: "100%", overflow: "hidden" }}>
-        <TableContainer sx={{ maxHeight: "calc(100vh - 300px)" }}>
-          <Table stickyHeader aria-label="insurance submissions table">
-            <TableHead>
-              <TableRow>
-                {sortedVisibleColumns.map((column) => (
-                  <TableCell key={column.id}>
-                    {column.sortable ? (
-                      <TableSortLabel
-                        active={sort === column.accessor}
-                        direction={sort === column.accessor ? order : "asc"}
-                        onClick={() => handleSortChange(column.accessor)}
-                      >
-                        {column.label}
-                      </TableSortLabel>
-                    ) : (
-                      column.label
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {isLoading ? (
+        <TableContainer sx={{ maxHeight: 550 }}>
+          {isLoading ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: 400,
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Table stickyHeader aria-label="submissions table">
+              <TableHead>
                 <TableRow>
-                  <TableCell
-                    colSpan={visibleColumns.length}
-                    align="center"
-                    sx={{ py: 4 }}
-                  >
-                    <CircularProgress />
-                  </TableCell>
+                  {visibleColumns.map((column) => (
+                    <TableCell key={column.id}>
+                      {column.sortable ? (
+                        <TableSortLabel
+                          active={sort === column.accessor}
+                          direction={sort === column.accessor ? order : "asc"}
+                          onClick={() => handleSortChange(column.accessor)}
+                        >
+                          {column.label}
+                        </TableSortLabel>
+                      ) : (
+                        column.label
+                      )}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              ) : submissions.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={visibleColumns.length}
-                    align="center"
-                    sx={{ py: 4 }}
-                  >
-                    <Typography>No submissions found</Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                submissions.map((submission) => (
-                  <TableRow hover key={submission.id}>
-                    {sortedVisibleColumns.map((column) => (
-                      <TableCell key={`${submission.id}-${column.id}`}>
-                        {renderCellContent(submission, column)}
-                      </TableCell>
-                    ))}
+              </TableHead>
+              <TableBody>
+                {submissions.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={visibleColumns.length} align="center">
+                      No submissions found.
+                    </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  submissions.map((submission) => (
+                    <TableRow
+                      hover
+                      key={submission.id}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      {visibleColumns.map((column) => (
+                        <TableCell key={`${submission.id}-${column.id}`}>
+                          {renderCellContent(submission, column)}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          )}
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25, 50]}

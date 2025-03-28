@@ -1,5 +1,5 @@
 import axios from "axios";
-import { FormData, FormStructure, FormSubmission } from "../types/form";
+import { FormData, FormStructure, TableResponse } from "../types/form";
 
 const API_BASE_URL = "https://assignment.devotel.io/api";
 
@@ -36,34 +36,18 @@ export const submitForm = async (
   return response.data;
 };
 
-export const getSubmissions = async (
-  page = 1,
-  limit = 10,
-  sort?: string,
-  order?: "asc" | "desc",
-  filter?: Record<string, string>
-): Promise<{
-  data: FormSubmission[];
-  total: number;
-  page: number;
-  limit: number;
-}> => {
-  let endpoint = `/insurance/forms/submissions?page=${page}&limit=${limit}`;
-
-  if (sort && order) {
-    endpoint += `&sort=${sort}&order=${order}`;
+/**
+ * Get submissions data
+ * @returns Table data with columns and rows
+ */
+export const getSubmissions = async (): Promise<TableResponse> => {
+  try {
+    const response = await api.get("/insurance/forms/submissions");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching submissions:", error);
+    throw error;
   }
-
-  if (filter) {
-    Object.entries(filter).forEach(([key, value]) => {
-      if (value) {
-        endpoint += `&${key}=${encodeURIComponent(value)}`;
-      }
-    });
-  }
-
-  const response = await api.get(endpoint);
-  return response.data;
 };
 
 /**

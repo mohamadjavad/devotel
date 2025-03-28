@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { getSubmissions } from "../services/api";
+import { TableData } from "../types/form";
 
 interface UseSubmissionsProps {
   initialPage?: number;
@@ -24,9 +25,60 @@ export const useSubmissions = ({
   const [filter, setFilter] = useState<Record<string, string>>(initialFilter);
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["submissions", page, limit, sort, order, filter],
-    queryFn: () => getSubmissions(page, limit, sort, order, filter),
+    queryKey: ["submissions"],
+    queryFn: () => getSubmissions(),
   });
+
+  // Process data client-side
+  const processedData = useMemo(() => {
+    if (!data) return { submissions: [], total: 0, columns: [] };
+
+    let filteredData = [...data.data];
+
+    // Apply filters
+    if (Object.keys(filter).length > 0) {
+      filteredData = filteredData.filter((item) => {
+        return Object.entries(filter).every(([key, value]) => {
+          if (!value) return true;
+          const itemValue = String(item[key] || "").toLowerCase();
+          return itemValue.includes(value.toLowerCase());
+        });
+      });
+    }
+
+    // Apply sorting
+    if (sort) {
+      filteredData.sort((a, b) => {
+        const valueA = a[sort];
+        const valueB = b[sort];
+
+        // Handle different data types for comparison
+        if (typeof valueA === "number" && typeof valueB === "number") {
+          return order === "asc" ? valueA - valueB : valueB - valueA;
+        }
+
+        const strA = String(valueA || "").toLowerCase();
+        const strB = String(valueB || "").toLowerCase();
+
+        return order === "asc"
+          ? strA.localeCompare(strB)
+          : strB.localeCompare(strA);
+      });
+    }
+
+    // Calculate total before pagination
+    const total = filteredData.length;
+
+    // Apply pagination
+    const startIndex = (page - 1) * limit;
+    const paginatedData = filteredData.slice(startIndex, startIndex + limit);
+
+    return {
+      submissions: paginatedData,
+      total,
+      columns: data.columns,
+    };
+  }, [data, page, limit, sort, order, filter]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -53,9 +105,23 @@ export const useSubmissions = ({
     setPage(1); // Reset to first page when changing filter
   };
 
+  // Map table columns to column definitions
+  const columnDefinitions = useMemo(() => {
+    if (!data?.columns) return [];
+
+    return data.columns.map((column) => ({
+      id: column,
+      label: column,
+      accessor: column,
+      sortable: true,
+      filterable: column !== "id",
+    }));
+  }, [data?.columns]);
+
   return {
-    submissions: data?.data || [],
-    total: data?.total || 0,
+    submissions: processedData.submissions as TableData[],
+    total: processedData.total,
+    columns: columnDefinitions,
     currentPage: page,
     pageSize: limit,
     sort,

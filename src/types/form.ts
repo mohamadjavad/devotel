@@ -45,15 +45,19 @@ export interface FormData {
   [key: string]: string | number | boolean | string[] | number[] | FormData;
 }
 
+// For the new table data response format
+export interface TableData {
+  id: string;
+  [key: string]: string | number | boolean | undefined;
+}
+
+export interface TableResponse {
+  columns: string[];
+  data: TableData[];
+}
+
 export interface FormSubmission {
   id: string;
-  type: string;
-  applicantName: string;
-  applicantAge?: number;
-  status: "Pending" | "Approved" | "Rejected";
-  city?: string;
-  submittedAt: string;
-  data: FormData;
   [key: string]: string | number | boolean | FormData | undefined;
 }
 
