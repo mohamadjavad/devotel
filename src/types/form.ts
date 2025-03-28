@@ -65,6 +65,6 @@ export interface ColumnDefinition {
   id: string;
   label: string;
   accessor: string;
-  sortable?: boolean;
-  filterable?: boolean;
+  sortable: boolean;
+  filterable: boolean;
 }
