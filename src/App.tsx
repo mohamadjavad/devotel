@@ -3,7 +3,6 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { ApplicationsListPage } from "./components/ApplicationsListPage";
 import { InsuranceFormPage } from "./components/InsuranceFormPage";
 import { Layout } from "./components/Layout";
-import { CountryStateForm } from "./examples/CountryStateForm";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -24,10 +23,7 @@ function App() {
           <Routes>
             <Route path="/new-application" element={<InsuranceFormPage />} />
             <Route path="/my-applications" element={<ApplicationsListPage />} />
-            <Route
-              path="/examples/country-state"
-              element={<CountryStateForm />}
-            />
+
             <Route
               path="/"
               element={<Navigate to="/new-application" replace />}
