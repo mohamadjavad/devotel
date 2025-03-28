@@ -1,0 +1,32 @@
+{
+  "appName": "پورتال بیمه هوشمند",
+  "navigation": {
+    "newApplication": "درخواست جدید",
+    "myApplications": "درخواست‌های من"
+  },
+  "insuranceTypes": {
+    "health": "بیمه سلامت",
+    "home": "بیمه منزل",
+    "car": "بیمه خودرو"
+  },
+  "footer": {
+    "rightsReserved": "© {{year}} پورتال بیمه هوشمند. تمامی حقوق محفوظ است."
+  },
+  "messages": {
+    "submissionSuccess": "درخواست شما با موفقیت ثبت شد!"
+  },
+  "form": {
+    "save": "ذخیره",
+    "submit": "ارسال",
+    "cancel": "انصراف",
+    "required": "ضروری",
+    "loading": "در حال بارگذاری...",
+    "autosaving": "در حال ذخیره خودکار...",
+    "autosaved": "ذخیره شد",
+    "autosaveFailed": "ذخیره خودکار انجام نشد"
+  },
+  "languageSelector": {
+    "english": "English",
+    "farsi": "فارسی"
+  }
+}

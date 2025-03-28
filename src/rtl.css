@@ -1,0 +1,70 @@
+/* RTL Support Styles */
+[dir="rtl"] {
+  /* Text alignment for RTL languages */
+  text-align: right;
+}
+
+/* RTL Input fields */
+[dir="rtl"] .MuiOutlinedInput-root {
+  text-align: right;
+}
+
+/* RTL Form labels */
+[dir="rtl"] .MuiFormLabel-root {
+  right: 0;
+  left: auto;
+  transform-origin: right top;
+}
+
+/* RTL Dialog alignment */
+[dir="rtl"] .MuiDialog-paper {
+  text-align: right;
+}
+
+/* RTL List items */
+[dir="rtl"] .MuiListItem-root {
+  text-align: right;
+}
+
+/* RTL Checkbox and Radio buttons */
+[dir="rtl"] .MuiCheckbox-root,
+[dir="rtl"] .MuiRadio-root {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+/* RTL Icons in buttons */
+[dir="rtl"] .MuiButton-startIcon {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+[dir="rtl"] .MuiButton-endIcon {
+  margin-left: 0;
+  margin-right: 8px;
+}
+
+/* RTL menu items */
+[dir="rtl"] .MuiMenuItem-root {
+  text-align: right;
+}
+
+/* RTL drawer */
+[dir="rtl"] .MuiDrawer-paper {
+  text-align: right;
+}
+
+/* RTL accordion */
+[dir="rtl"] .MuiAccordionSummary-content {
+  text-align: right;
+}
+
+[dir="rtl"] .MuiAccordionSummary-expandIconWrapper {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+/* Font for Farsi language */
+html[lang="fa"] body {
+  font-family: "Tahoma", "Vazirmatn", "Arial", sans-serif;
+}

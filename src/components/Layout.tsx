@@ -13,6 +13,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { FC, ReactNode, useMemo, useState } from "react";
+import { useLanguage } from "../hooks/useLanguage";
+import { LanguageSelector } from "./LanguageSelector";
 import { NavMenu } from "./NavMenu";
 
 interface LayoutProps {
@@ -22,6 +24,7 @@ interface LayoutProps {
 export const Layout: FC<LayoutProps> = ({ children }) => {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
   const [darkMode, setDarkMode] = useState(prefersDarkMode);
+  const { t, isRTL } = useLanguage();
 
   const theme = useMemo(
     () =>
@@ -53,8 +56,9 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
             },
           },
         },
+        direction: isRTL ? "rtl" : "ltr",
       }),
-    [darkMode]
+    [darkMode, isRTL]
   );
 
   const toggleDarkMode = () => {
@@ -81,12 +85,15 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
             }}
           >
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Smart Insurance Portal
+              {t("appName")}
             </Typography>
             <NavMenu />
-            <IconButton color="inherit" onClick={toggleDarkMode}>
-              {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-            </IconButton>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <LanguageSelector />
+              <IconButton color="inherit" onClick={toggleDarkMode}>
+                {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+              </IconButton>
+            </Box>
           </Toolbar>
         </AppBar>
         <Container
@@ -121,8 +128,7 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
         >
           <Container maxWidth={false}>
             <Typography variant="body2" color="text.secondary" align="center">
-              © {new Date().getFullYear()} Smart Insurance Portal. All rights
-              reserved.
+              {t("footer.rightsReserved", { year: new Date().getFullYear() })}
             </Typography>
           </Container>
         </Box>

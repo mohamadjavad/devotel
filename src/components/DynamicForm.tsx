@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import { useDynamicForm } from "../hooks/useDynamicForm";
+import { useLanguage } from "../hooks/useLanguage";
 import { FormStructure } from "../types/form";
 import { DynamicField } from "./DynamicField";
 
@@ -35,6 +36,7 @@ export const DynamicForm: FC<DynamicFormProps> = ({
   enableAutosave = false,
   draftKey,
 }) => {
+  const { t } = useLanguage();
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const theme = useTheme();
@@ -108,7 +110,7 @@ export const DynamicForm: FC<DynamicFormProps> = ({
   if (!formStructure || !formReady) {
     return (
       <Box sx={{ textAlign: "center", p: 4, width: "100%" }}>
-        <Typography variant="body1">No form structure available.</Typography>
+        <Typography variant="body1">{t("form.loading")}</Typography>
       </Box>
     );
   }
@@ -168,9 +170,9 @@ export const DynamicForm: FC<DynamicFormProps> = ({
                   fontSize="small"
                   sx={{ verticalAlign: "middle", mr: 0.5 }}
                 />
-                Last autosaved: {lastSaved.toLocaleTimeString()}
+                {t("form.autosaved")}: {lastSaved.toLocaleTimeString()}
               </Typography>
-              <Tooltip title="Clear saved draft">
+              <Tooltip title={t("form.cancel")}>
                 <IconButton
                   size="small"
                   color="default"
@@ -199,7 +201,7 @@ export const DynamicForm: FC<DynamicFormProps> = ({
             disabled={submitting || !formik.isValid || !formik.dirty}
             fullWidth={isMobile}
           >
-            Save Draft
+            {t("form.save")}
           </Button>
           <Button
             type="submit"
@@ -212,12 +214,12 @@ export const DynamicForm: FC<DynamicFormProps> = ({
             {submitting ? (
               <>
                 <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
-                Submitting...
+                {t("form.loading")}
               </>
             ) : submitSuccess ? (
-              "Submitted!"
+              t("form.autosaved")
             ) : (
-              "Submit Application"
+              t("form.submit")
             )}
           </Button>
         </Box>

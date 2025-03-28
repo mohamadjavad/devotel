@@ -1,0 +1,32 @@
+{
+  "appName": "Smart Insurance Portal",
+  "navigation": {
+    "newApplication": "New Application",
+    "myApplications": "My Applications"
+  },
+  "insuranceTypes": {
+    "health": "Health Insurance",
+    "home": "Home Insurance",
+    "car": "Car Insurance"
+  },
+  "footer": {
+    "rightsReserved": "© {{year}} Smart Insurance Portal. All rights reserved."
+  },
+  "messages": {
+    "submissionSuccess": "Your application was submitted successfully!"
+  },
+  "form": {
+    "save": "Save",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "required": "Required",
+    "loading": "Loading...",
+    "autosaving": "Autosaving...",
+    "autosaved": "Autosaved",
+    "autosaveFailed": "Autosave failed"
+  },
+  "languageSelector": {
+    "english": "English",
+    "farsi": "فارسی"
+  }
+}

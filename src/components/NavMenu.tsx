@@ -3,9 +3,11 @@ import ListIcon from "@mui/icons-material/List";
 import { Button, ButtonGroup } from "@mui/material";
 import { FC } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useLanguage } from "../hooks/useLanguage";
 
 export const NavMenu: FC = () => {
   const location = useLocation();
+  const { t } = useLanguage();
 
   return (
     <ButtonGroup variant="contained" color="primary" sx={{ mr: 2 }}>
@@ -17,7 +19,7 @@ export const NavMenu: FC = () => {
           location.pathname === "/new-application" ? "contained" : "outlined"
         }
       >
-        New Application
+        {t("navigation.newApplication")}
       </Button>
       <Button
         component={Link}
@@ -27,7 +29,7 @@ export const NavMenu: FC = () => {
           location.pathname === "/my-applications" ? "contained" : "outlined"
         }
       >
-        My Applications
+        {t("navigation.myApplications")}
       </Button>
       {/* <Button
         component={Link}
