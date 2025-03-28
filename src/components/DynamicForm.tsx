@@ -12,6 +12,8 @@ import {
   IconButton,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import { useDynamicForm } from "../hooks/useDynamicForm";
@@ -35,6 +37,8 @@ export const DynamicForm: FC<DynamicFormProps> = ({
 }) => {
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const {
     formik,
@@ -93,7 +97,9 @@ export const DynamicForm: FC<DynamicFormProps> = ({
 
   if (isLoading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+      <Box
+        sx={{ display: "flex", justifyContent: "center", p: 4, width: "100%" }}
+      >
         <CircularProgress />
       </Box>
     );
@@ -101,15 +107,15 @@ export const DynamicForm: FC<DynamicFormProps> = ({
 
   if (!formStructure || !formReady) {
     return (
-      <Box sx={{ textAlign: "center", p: 4 }}>
+      <Box sx={{ textAlign: "center", p: 4, width: "100%" }}>
         <Typography variant="body1">No form structure available.</Typography>
       </Box>
     );
   }
 
   return (
-    <Box component="form" onSubmit={handleSubmit}>
-      <Card sx={{ mb: 3 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
+      <Card sx={{ mb: 3, width: "100%" }}>
         <CardContent>
           <Typography variant="h5" component="h2" gutterBottom>
             {formStructure.title}
@@ -120,10 +126,10 @@ export const DynamicForm: FC<DynamicFormProps> = ({
         </CardContent>
       </Card>
 
-      <Card sx={{ mb: 3 }}>
+      <Card sx={{ mb: 3, width: "100%" }}>
         <CardContent>
           {visibleFormStructure.fields.map((field, index) => (
-            <Box key={field.id}>
+            <Box key={field.id} sx={{ width: "100%" }}>
               <DynamicField
                 field={field}
                 formik={formik}
@@ -142,11 +148,21 @@ export const DynamicForm: FC<DynamicFormProps> = ({
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          flexDirection: isMobile ? "column" : "row",
+          gap: 2,
+          width: "100%",
         }}
       >
-        <Box>
+        <Box sx={{ width: isMobile ? "100%" : "auto" }}>
           {enableAutosave && lastSaved && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                width: "100%",
+              }}
+            >
               <Typography variant="body2" color="text.secondary">
                 <AutorenewIcon
                   fontSize="small"
@@ -167,13 +183,21 @@ export const DynamicForm: FC<DynamicFormProps> = ({
             </Box>
           )}
         </Box>
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            width: isMobile ? "100%" : "auto",
+            justifyContent: isMobile ? "center" : "flex-end",
+          }}
+        >
           <Button
             type="button"
             variant="outlined"
             startIcon={<SaveIcon />}
             onClick={handleSaveDraft}
             disabled={submitting || !formik.isValid || !formik.dirty}
+            fullWidth={isMobile}
           >
             Save Draft
           </Button>
@@ -183,6 +207,7 @@ export const DynamicForm: FC<DynamicFormProps> = ({
             color={submitSuccess ? "success" : "primary"}
             disabled={submitting || !formik.isValid}
             startIcon={submitSuccess ? <CheckCircleIcon /> : undefined}
+            fullWidth={isMobile}
           >
             {submitting ? (
               <>

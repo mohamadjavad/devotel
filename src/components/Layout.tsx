@@ -69,11 +69,17 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
           display: "flex",
           flexDirection: "column",
           minHeight: "100vh",
-          minWidth: "100vw",
+          width: "100%",
         }}
       >
         <AppBar position="static">
-          <Toolbar>
+          <Toolbar
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row", md: "row" },
+              gap: { xs: 2, sm: 2, md: 2 },
+            }}
+          >
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               Smart Insurance Portal
             </Typography>
@@ -83,7 +89,27 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
             </IconButton>
           </Toolbar>
         </AppBar>
-        <Container sx={{ mt: 4, mb: 4, flex: 1 }}>{children}</Container>
+        <Container
+          maxWidth={false}
+          sx={{
+            mt: { xs: 2, sm: 3, md: 4 },
+            mb: { xs: 2, sm: 3, md: 4 },
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            px: { xs: 2, sm: 3, md: 4 },
+          }}
+        >
+          <Box
+            sx={{
+              width: "100%",
+              maxWidth: { sm: "100%", md: "1200px" },
+              mx: "auto",
+            }}
+          >
+            {children}
+          </Box>
+        </Container>
         <Box
           component="footer"
           sx={{
@@ -93,7 +119,7 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
             borderColor: "divider",
           }}
         >
-          <Container>
+          <Container maxWidth={false}>
             <Typography variant="body2" color="text.secondary" align="center">
               © {new Date().getFullYear()} Smart Insurance Portal. All rights
               reserved.

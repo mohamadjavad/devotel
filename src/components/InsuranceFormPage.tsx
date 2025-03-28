@@ -37,20 +37,43 @@ export const InsuranceFormPage: FC = () => {
   };
 
   return (
-    <Box>
+    <Box
+      sx={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
       {submissionSuccess && (
-        <Alert severity="success" sx={{ mb: 3 }}>
+        <Alert
+          severity="success"
+          sx={{
+            mb: 3,
+            width: "100%",
+            maxWidth: "100%",
+          }}
+        >
           Your application was submitted successfully!
         </Alert>
       )}
 
-      <Paper sx={{ mb: 3 }}>
+      <Paper
+        sx={{
+          mb: 3,
+          width: "100%",
+          maxWidth: "100%",
+        }}
+      >
         <Tabs
           value={selectedType}
           onChange={handleTypeChange}
           variant="scrollable"
           scrollButtons="auto"
           aria-label="insurance type tabs"
+          sx={{
+            width: "100%",
+          }}
         >
           {INSURANCE_TYPES.map((type) => (
             <Tab key={type.id} label={type.label} value={type.id} />
@@ -58,13 +81,15 @@ export const InsuranceFormPage: FC = () => {
         </Tabs>
       </Paper>
 
-      <DynamicForm
-        formStructure={formStructure}
-        isLoading={isLoading}
-        onSubmitSuccess={handleSubmitSuccess}
-        enableAutosave={true}
-        draftKey={draftKey}
-      />
+      <Box sx={{ width: "100%" }}>
+        <DynamicForm
+          formStructure={formStructure}
+          isLoading={isLoading}
+          onSubmitSuccess={handleSubmitSuccess}
+          enableAutosave={true}
+          draftKey={draftKey}
+        />
+      </Box>
     </Box>
   );
 };
