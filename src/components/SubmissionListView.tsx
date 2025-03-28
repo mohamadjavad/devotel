@@ -88,7 +88,7 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
     } else if (!searchText && Object.keys(filter).length > 0) {
       handleFilterChange({});
     }
-  }, [searchText, filterField, handleFilterChange]);
+  }, [searchText, filterField, handleFilterChange, filter]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
