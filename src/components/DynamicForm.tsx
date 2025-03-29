@@ -1,13 +1,16 @@
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import SaveIcon from "@mui/icons-material/Save";
 import {
+  Alert,
   Box,
   Button,
   Card,
   CardContent,
   CircularProgress,
+  Collapse,
   Divider,
   IconButton,
   Tooltip,
@@ -41,6 +44,7 @@ export const DynamicForm: FC<DynamicFormProps> = ({
   const { t: t_i18n } = useTranslation();
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -76,13 +80,37 @@ export const DynamicForm: FC<DynamicFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    try {
-      await formik.submitForm();
-    } catch (error) {
-      console.error(t_i18n("form.autosaveFailed"), error);
-    } finally {
-      setSubmitting(false);
+
+    // Validate all form fields and show all errors
+    const errors = await formik.validateForm();
+    formik.setTouched(
+      Object.keys(formik.values).reduce((touched, field) => {
+        touched[field] = true;
+        return touched;
+      }, {} as { [key: string]: boolean })
+    );
+
+    // Only proceed with submission if form is valid
+    if (Object.keys(errors).length === 0) {
+      setShowValidationErrors(false);
+      setSubmitting(true);
+      try {
+        await formik.submitForm();
+      } catch (error) {
+        console.error(t_i18n("form.autosaveFailed"), error);
+      } finally {
+        setSubmitting(false);
+      }
+    } else {
+      // Show validation error summary
+      setShowValidationErrors(true);
+      // Auto-scroll to the first error
+      setTimeout(() => {
+        const errorElement = document.querySelector(".Mui-error");
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
     }
   };
 
@@ -130,6 +158,18 @@ export const DynamicForm: FC<DynamicFormProps> = ({
           <Typography variant="body2" color="text.secondary" gutterBottom>
             {t("messages.fillRequired")}
           </Typography>
+
+          {/* Validation error summary */}
+          <Collapse in={showValidationErrors}>
+            <Alert
+              severity="error"
+              sx={{ mt: 2 }}
+              icon={<ErrorOutlineIcon />}
+              onClose={() => setShowValidationErrors(false)}
+            >
+              {t("validation.formHasErrors")}
+            </Alert>
+          </Collapse>
         </CardContent>
       </Card>
 
@@ -167,86 +207,85 @@ export const DynamicForm: FC<DynamicFormProps> = ({
         </CardContent>
       </Card>
 
-      <Box
+      <Card
         sx={{
           mt: 3,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexDirection: isMobile ? "column" : "row",
-          gap: 2,
+          mb: 3,
+
           width: "100%",
         }}
       >
-        <Box sx={{ width: isMobile ? "100%" : "auto" }}>
-          {enableAutosave && lastSaved && (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                width: "100%",
-              }}
-            >
-              <Typography variant="body2" color="text.secondary">
-                <AutorenewIcon
-                  fontSize="small"
-                  sx={{ verticalAlign: "middle", mr: 0.5 }}
-                />
-                {t("form.autosaved")}: {lastSaved.toLocaleTimeString()}
-              </Typography>
-              <Tooltip title={t("form.cancel")}>
-                <IconButton
-                  size="small"
-                  color="default"
-                  onClick={handleClearDraft}
-                  aria-label={t_i18n("form.clearDraft")}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          )}
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            gap: 2,
-            width: isMobile ? "100%" : "auto",
-            justifyContent: isMobile ? "center" : "flex-end",
-          }}
-        >
-          <Button
-            type="button"
-            variant="outlined"
-            startIcon={<SaveIcon />}
-            onClick={handleSaveDraft}
-            disabled={submitting || !formik.isValid || !formik.dirty}
-            fullWidth={isMobile}
-          >
-            {t("form.saveDraft")}
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            color={submitSuccess ? "success" : "primary"}
-            disabled={submitting || !formik.isValid}
-            startIcon={submitSuccess ? <CheckCircleIcon /> : undefined}
-            fullWidth={isMobile}
-          >
-            {submitting ? (
-              <>
-                <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
-                {t("form.submitting")}
-              </>
-            ) : submitSuccess ? (
-              t("form.submitted")
-            ) : (
-              t("form.submit")
+        <CardContent>
+          <Box sx={{ width: isMobile ? "100%" : "auto" }}>
+            {enableAutosave && lastSaved && (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  width: "100%",
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  <AutorenewIcon
+                    fontSize="small"
+                    sx={{ verticalAlign: "middle", mr: 0.5 }}
+                  />
+                  {t("form.autosaved")}: {lastSaved.toLocaleTimeString()}
+                </Typography>
+                <Tooltip title={t("form.cancel")}>
+                  <IconButton
+                    size="small"
+                    color="default"
+                    onClick={handleClearDraft}
+                    aria-label={t_i18n("form.clearDraft")}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
             )}
-          </Button>
-        </Box>
-      </Box>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              width: isMobile ? "100%" : "auto",
+              justifyContent: isMobile ? "center" : "flex-end",
+            }}
+          >
+            <Button
+              type="button"
+              variant="outlined"
+              startIcon={<SaveIcon />}
+              onClick={handleSaveDraft}
+              disabled={submitting || !formik.dirty}
+              fullWidth={isMobile}
+            >
+              {t("form.saveDraft")}
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              color={submitSuccess ? "success" : "primary"}
+              disabled={submitting || !formik.isValid}
+              startIcon={submitSuccess ? <CheckCircleIcon /> : undefined}
+              fullWidth={isMobile}
+            >
+              {submitting ? (
+                <>
+                  <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
+                  {t("form.submitting")}
+                </>
+              ) : submitSuccess ? (
+                t("form.submitted")
+              ) : (
+                t("form.submit")
+              )}
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
     </Box>
   );
 };

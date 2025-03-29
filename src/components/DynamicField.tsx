@@ -38,6 +38,18 @@ const ltrStyles = {
   },
 };
 
+// Common error styles
+const errorStyles = {
+  "& .MuiFormHelperText-root.Mui-error": {
+    fontSize: "0.75rem",
+    marginTop: "3px",
+    fontWeight: "500",
+  },
+  "& .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline": {
+    borderWidth: "2px",
+  },
+};
+
 interface DynamicFieldProps {
   field: FormField;
   formik: FormikProps<FormData>;
@@ -50,10 +62,8 @@ export const DynamicField: FC<DynamicFieldProps> = ({
   getFieldOptions,
 }) => {
   const { t } = useLanguage();
-  const { errors, touched, values, handleChange, handleBlur, setFieldValue } =
-    formik;
-  const fieldError =
-    touched[field.id] && errors[field.id] ? String(errors[field.id]) : "";
+  const { errors, values, handleChange, handleBlur, setFieldValue } = formik;
+  const fieldError = errors[field.id] ? String(errors[field.id]) : "";
 
   // Function to get translated field labels based on field ID
   const getFieldLabel = (fieldId: string, defaultLabel: string) => {
@@ -92,9 +102,11 @@ export const DynamicField: FC<DynamicFieldProps> = ({
       error={Boolean(fieldError)}
       helperText={fieldError}
       margin="normal"
+      required={field.required}
       sx={{
         ...ltrStyles,
         textAlign: "left",
+        ...errorStyles,
       }}
     />
   );
@@ -114,9 +126,11 @@ export const DynamicField: FC<DynamicFieldProps> = ({
         error={Boolean(fieldError)}
         helperText={fieldError}
         margin="normal"
+        required={field.required}
         sx={{
           ...ltrStyles,
           textAlign: "left",
+          ...errorStyles,
         }}
         slotProps={{
           htmlInput: field.validation
@@ -143,9 +157,11 @@ export const DynamicField: FC<DynamicFieldProps> = ({
       error={Boolean(fieldError)}
       helperText={fieldError}
       margin="normal"
+      required={field.required}
       sx={{
         ...ltrStyles,
         textAlign: "left",
+        ...errorStyles,
       }}
       slotProps={{
         inputLabel: {
@@ -269,9 +285,11 @@ export const DynamicField: FC<DynamicFieldProps> = ({
         fullWidth
         margin="normal"
         error={Boolean(fieldError)}
+        required={field.required}
         sx={{
           ...ltrStyles,
           textAlign: "left",
+          ...errorStyles,
         }}
       >
         <InputLabel
