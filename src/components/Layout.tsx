@@ -55,6 +55,31 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
               },
             },
           },
+          MuiButtonGroup: {
+            styleOverrides: {
+              root: {
+                direction: isRTL ? "rtl" : "ltr",
+              },
+              grouped: {
+                "&:not(:last-of-type)": isRTL
+                  ? {
+                      borderTopLeftRadius: "inherit",
+                      borderBottomLeftRadius: "inherit",
+                      borderTopRightRadius: 0,
+                      borderBottomRightRadius: 0,
+                    }
+                  : {},
+                "&:not(:first-of-type)": isRTL
+                  ? {
+                      borderTopRightRadius: "inherit",
+                      borderBottomRightRadius: "inherit",
+                      borderTopLeftRadius: 0,
+                      borderBottomLeftRadius: 0,
+                    }
+                  : {},
+              },
+            },
+          },
         },
         direction: isRTL ? "rtl" : "ltr",
       }),
@@ -100,11 +125,12 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
           maxWidth={false}
           sx={{
             mt: { xs: 2, sm: 3, md: 4 },
-            mb: { xs: 2, sm: 3, md: 4 },
+            // mb: { xs: 2, sm: 3, md: 4 },
             flex: 1,
             display: "flex",
             flexDirection: "column",
             px: { xs: 2, sm: 3, md: 4 },
+            bgcolor: "background.paper",
           }}
         >
           <Box
@@ -112,6 +138,7 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
               width: "100%",
               maxWidth: { sm: "100%", md: "1200px" },
               mx: "auto",
+              bgcolor: "background.paper",
             }}
           >
             {children}

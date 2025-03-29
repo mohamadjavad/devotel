@@ -3,6 +3,9 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import Backend from "i18next-http-backend";
 import { initReactI18next } from "react-i18next";
 
+// RTL languages
+export const RTL_LANGUAGES = ["ar", "fa", "he", "ur"];
+
 i18n
   // Load translations from /public/locales
   .use(Backend)
@@ -13,14 +16,14 @@ i18n
   // Initialize i18next
   .init({
     fallbackLng: "en",
-    supportedLngs: ["en", "fa"],
+    supportedLngs: ["en", "ar", "fa"],
     debug: import.meta.env.DEV,
 
     interpolation: {
       escapeValue: false, // React already safes from XSS
     },
 
-    // Handling RTL for Farsi
+    // Handling RTL for Arabic and Farsi
     react: {
       useSuspense: true,
     },
@@ -33,5 +36,10 @@ i18n
     // Default namespace
     defaultNS: "common",
   });
+
+// Function to check if a language is RTL
+export const isRTL = (language: string) => {
+  return RTL_LANGUAGES.includes(language);
+};
 
 export default i18n;

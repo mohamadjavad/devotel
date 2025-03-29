@@ -1,8 +1,27 @@
 {
   "appName": "پورتال بیمه هوشمند",
+  "direction": "rtl",
   "navigation": {
     "newApplication": "درخواست جدید",
     "myApplications": "درخواست‌های من"
+  },
+  "common": {
+    "changeLanguage": "تغییر زبان",
+    "fieldTypes": {
+      "text": "متن",
+      "number": "عدد",
+      "date": "تاریخ",
+      "checkbox": "چک باکس",
+      "radio": "دکمه رادیویی",
+      "select": "انتخابی",
+      "group": "گروه",
+      "unknown": "نوع فیلد ناشناخته"
+    }
+  },
+  "language": {
+    "en": "English",
+    "fa": "فارسی",
+    "ar": "العربية"
   },
   "insuranceTypes": {
     "health": "بیمه سلامت",
@@ -12,8 +31,14 @@
   "footer": {
     "rightsReserved": "© {{year}} پورتال بیمه هوشمند. تمامی حقوق محفوظ است."
   },
+  "applications": {
+    "description": "تمام درخواست‌های بیمه خود را در یک مکان مشاهده و مدیریت کنید. می‌توانید با استفاده از کنترل‌های بالای جدول، فیلتر، مرتب‌سازی و سفارشی‌سازی ستون‌ها را انجام دهید."
+  },
   "messages": {
-    "submissionSuccess": "درخواست شما با موفقیت ثبت شد!"
+    "submissionSuccess": "درخواست شما با موفقیت ثبت شد!",
+    "clearDraftConfirmation": "آیا مطمئن هستید که می‌خواهید پیش‌نویس ذخیره شده را پاک کنید؟",
+    "noFormStructure": "ساختار فرم در دسترس نیست.",
+    "fillRequired": "لطفاً تمام فیلدهای ضروری را پر کنید."
   },
   "form": {
     "save": "ذخیره",
@@ -23,10 +48,96 @@
     "loading": "در حال بارگذاری...",
     "autosaving": "در حال ذخیره خودکار...",
     "autosaved": "ذخیره شد",
-    "autosaveFailed": "ذخیره خودکار انجام نشد"
+    "autosaveFailed": "ذخیره خودکار انجام نشد",
+    "saveDraft": "ذخیره پیش‌نویس",
+    "submitting": "در حال ارسال...",
+    "submitted": "ارسال شد!",
+    "clearDraft": "پاک کردن پیش‌نویس",
+    "titles": {
+      "health_insurance_application": "درخواست بیمه سلامت",
+      "home_insurance_application": "درخواست بیمه منزل",
+      "car_insurance_application": "درخواست بیمه خودرو"
+    }
+  },
+  "validation": {
+    "required": "این فیلد الزامی است",
+    "email": "لطفا یک آدرس ایمیل معتبر وارد کنید",
+    "min": "باید حداقل {{min}} باشد",
+    "max": "باید حداکثر {{max}} باشد",
+    "pattern": "فرمت نامعتبر است",
+    "minLength": "باید حداقل {{min}} کاراکتر باشد",
+    "maxLength": "باید حداکثر {{max}} کاراکتر باشد"
   },
   "languageSelector": {
     "english": "English",
-    "farsi": "فارسی"
+    "farsi": "فارسی",
+    "arabic": "العربية"
+  },
+  "submissions": {
+    "title": "درخواست‌ها",
+    "filter": "فیلتر",
+    "columns": "ستون‌ها",
+    "search": "جستجو",
+    "searchPlaceholder": "جستجو بر اساس {{field}}...",
+    "selectField": "یک فیلد برای جستجو انتخاب کنید",
+    "clearSearch": "پاک کردن جستجو",
+    "activeFilters": "فیلترهای فعال",
+    "clearAll": "پاک کردن همه",
+    "noResults": "هیچ درخواستی یافت نشد.",
+    "error": "خطا در بارگذاری درخواست‌ها. لطفاً بعداً دوباره امتحان کنید.",
+    "retry": "تلاش مجدد",
+    "sortBy": "مرتب‌سازی بر اساس",
+    "ascending": "صعودی",
+    "descending": "نزولی",
+    "status": "وضعیت",
+    "date": "تاریخ",
+    "id": "شناسه",
+    "type": "نوع",
+    "actions": "اقدامات",
+    "view": "مشاهده",
+    "edit": "ویرایش",
+    "delete": "حذف"
+  },
+  "tableLabels": {
+    "itemsPerPage": "تعداد در هر صفحه",
+    "page": "صفحه",
+    "of": "از",
+    "nextPage": "صفحه بعد",
+    "previousPage": "صفحه قبل"
+  },
+  "formFields": {
+    "country": "کشور",
+    "state": "استان/ایالت",
+    "firstName": "نام",
+    "lastName": "نام خانوادگی",
+    "email": "ایمیل",
+    "phone": "تلفن",
+    "address": "آدرس",
+    "city": "شهر",
+    "zipCode": "کد پستی",
+    "birthDate": "تاریخ تولد",
+    "gender": "جنسیت",
+    "occupation": "شغل"
+  },
+  "chipLabels": {
+    "health": "سلامت",
+    "home": "منزل",
+    "car": "خودرو",
+    "approved": "تأیید شده",
+    "rejected": "رد شده",
+    "pending": "در انتظار"
+  },
+  "options": {
+    "male": "مرد",
+    "female": "زن",
+    "other": "سایر",
+    "yes": "بله",
+    "no": "خیر",
+    "individual": "فردی",
+    "family": "خانوادگی",
+    "business": "تجاری",
+    "basic": "پایه",
+    "standard": "استاندارد",
+    "premium": "ویژه"
   }
 }

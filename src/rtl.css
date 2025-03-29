@@ -2,18 +2,63 @@
 [dir="rtl"] {
   /* Text alignment for RTL languages */
   text-align: right;
+  letter-spacing: 0; /* Remove letter spacing for RTL languages */
+  font-feature-settings: "kern", "liga", "calt";
+  text-rendering: optimizeLegibility;
 }
 
 /* RTL Input fields */
 [dir="rtl"] .MuiOutlinedInput-root {
   text-align: right;
+  direction: rtl;
+  line-height: 1.5;
 }
 
+[dir="rtl"] .MuiInputBase-root {
+  line-height: 1.5;
+}
+
+/* RTL Input label positioning */
+[dir="rtl"] .MuiInputLabel-root {
+  left: auto !important;
+  right: 0 !important;
+  transform-origin: top right !important;
+}
+
+/* Fix label animation when focused in RTL mode */
+/* [dir="rtl"] .MuiInputLabel-shrink {
+  transform: translate(14px, -9px) scale(0.75) !important;
+  transform-origin: top right !important;
+} */
+
+/* RTL Form Control Labels */
+/* [dir="rtl"] .MuiFormControlLabel-root {
+  margin-left: 0;
+  margin-right: -11px;
+} */
+
 /* RTL Form labels */
-[dir="rtl"] .MuiFormLabel-root {
+/* [dir="rtl"] .MuiFormLabel-root {
   right: 0;
   left: auto;
   transform-origin: right top;
+  text-align: right;
+} */
+
+/* RTL Input Adornment */
+[dir="rtl"] .MuiInputAdornment-root {
+  margin-left: 0;
+  margin-right: 8px;
+}
+
+[dir="rtl"] .MuiInputAdornment-positionStart {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+/* RTL FormHelperText alignment */
+[dir="rtl"] .MuiFormHelperText-root {
+  text-align: right;
 }
 
 /* RTL Dialog alignment */
@@ -64,7 +109,221 @@
   margin-left: 0;
 }
 
+/* RTL Button Group fixes */
+[dir="rtl"] .MuiButtonGroup-root .MuiButtonGroup-grouped:not(:last-of-type) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: 1px solid rgba(0, 0, 0, 0.23);
+  border-top-left-radius: inherit;
+  border-bottom-left-radius: inherit;
+  border-left: 0;
+}
+
+[dir="rtl"] .MuiButtonGroup-root .MuiButtonGroup-grouped:not(:first-of-type) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 1px solid rgba(0, 0, 0, 0.23);
+  border-top-right-radius: inherit;
+  border-bottom-right-radius: inherit;
+  border-right: 0;
+}
+
+/* Fix button order in RTL mode */
+[dir="rtl"] .MuiButtonGroup-root {
+  flex-direction: row-reverse;
+}
+
+/* Fix TextField notched outline in RTL mode */
+/* [dir="rtl"] .MuiOutlinedInput-notchedOutline {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .MuiOutlinedInput-notchedOutline legend {
+  text-align: right;
+  direction: rtl;
+} */
+
+/* Improve RTL input field font rendering */
+[dir="rtl"] .MuiOutlinedInput-input,
+[dir="rtl"] .MuiInputBase-input {
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Fix Select in RTL mode */
+[dir="rtl"] .MuiNativeSelect-select,
+[dir="rtl"] .MuiSelect-select {
+  padding-right: 12px !important;
+  padding-left: 32px !important;
+  text-align: right;
+}
+
+[dir="rtl"] .MuiSelect-icon {
+  right: auto !important;
+  left: 7px !important;
+}
+
 /* Font for Farsi language */
 html[lang="fa"] body {
-  font-family: "Tahoma", "Vazirmatn", "Arial", sans-serif;
+  font-family: "Vazirmatn", "Shabnam", "Sahel", "Samim", "IRANSans", "Gandom",
+    "Tahoma", "Arial", sans-serif;
+}
+
+/* Font for Arabic language */
+html[lang="ar"] body {
+  font-family: "Amiri", "Tajawal", "Scheherazade New", "Noto Sans Arabic",
+    "Tahoma", "Arial", sans-serif;
+}
+
+/* Additional control for form control label positioning in RTL */
+[dir="rtl"] .MuiFormControlLabel-root {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .MuiFormControlLabel-labelPlacementStart {
+  margin-left: 0;
+  margin-right: 16px;
+}
+
+[dir="rtl"] .MuiFormControlLabel-labelPlacementEnd {
+  margin-right: 0;
+  margin-left: 16px;
+}
+
+/* Typography improvements for RTL mode */
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6 {
+  font-weight: 700;
+}
+
+[dir="rtl"] .MuiTypography-root {
+  font-weight: 400;
+}
+
+[dir="rtl"] .MuiInputBase-input {
+  font-weight: 400;
+}
+
+[dir="rtl"] .MuiButton-root {
+  font-weight: 500;
+}
+
+/* Apply fonts to all MUI components for Farsi */
+html[lang="fa"] .MuiTypography-root,
+html[lang="fa"] .MuiButton-root,
+html[lang="fa"] .MuiInputBase-root,
+html[lang="fa"] .MuiInputLabel-root,
+html[lang="fa"] .MuiFormLabel-root,
+html[lang="fa"] .MuiMenuItem-root,
+html[lang="fa"] .MuiListItemText-primary,
+html[lang="fa"] .MuiListItemText-secondary,
+html[lang="fa"] .MuiTab-root,
+html[lang="fa"] .MuiChip-label,
+html[lang="fa"] .MuiAlert-message,
+html[lang="fa"] .MuiTableCell-root {
+  font-family: "Vazirmatn", "Shabnam", "Sahel", "Samim", "IRANSans", "Gandom",
+    "Tahoma", "Arial", sans-serif !important;
+}
+
+/* Apply fonts to all MUI components for Arabic */
+html[lang="ar"] .MuiTypography-root,
+html[lang="ar"] .MuiButton-root,
+html[lang="ar"] .MuiInputBase-root,
+html[lang="ar"] .MuiInputLabel-root,
+html[lang="ar"] .MuiFormLabel-root,
+html[lang="ar"] .MuiMenuItem-root,
+html[lang="ar"] .MuiListItemText-primary,
+html[lang="ar"] .MuiListItemText-secondary,
+html[lang="ar"] .MuiTab-root,
+html[lang="ar"] .MuiChip-label,
+html[lang="ar"] .MuiAlert-message,
+html[lang="ar"] .MuiTableCell-root {
+  font-family: "Amiri", "Tajawal", "Scheherazade New", "Noto Sans Arabic",
+    "Tahoma", "Arial", sans-serif !important;
+}
+
+/* RTL-specific font adjustments */
+html[lang="fa"] .MuiInputBase-input {
+  font-family: "Vazirmatn", "Shabnam", "Sahel", "Samim", "IRANSans", "Gandom",
+    "Tahoma", "Arial", sans-serif;
+  line-height: 1.8;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+html[lang="fa"] .MuiInputLabel-root {
+  font-family: "Vazirmatn", "Shabnam", "Sahel", "Samim", "IRANSans", "Gandom",
+    "Tahoma", "Arial", sans-serif;
+}
+
+html[lang="fa"] .MuiButton-root {
+  font-family: "Vazirmatn", "Shabnam", "Sahel", "Samim", "IRANSans", "Gandom",
+    "Tahoma", "Arial", sans-serif;
+  font-weight: 500;
+}
+
+/* Arabic-specific font adjustments */
+html[lang="ar"] .MuiInputBase-input {
+  font-family: "Amiri", "Tajawal", "Scheherazade New", "Noto Sans Arabic",
+    "Tahoma", "Arial", sans-serif;
+  line-height: 1.8;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+html[lang="ar"] .MuiInputLabel-root {
+  font-family: "Amiri", "Tajawal", "Scheherazade New", "Noto Sans Arabic",
+    "Tahoma", "Arial", sans-serif;
+}
+
+html[lang="ar"] .MuiButton-root {
+  font-family: "Amiri", "Tajawal", "Scheherazade New", "Noto Sans Arabic",
+    "Tahoma", "Arial", sans-serif;
+  font-weight: 500;
+}
+
+/* Improve number rendering in Persian */
+html[lang="fa"] .MuiInputBase-input[type="number"],
+html[lang="ar"] .MuiInputBase-input[type="number"] {
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+/* Improve Persian font kerning and spacing */
+html[lang="fa"] {
+  letter-spacing: -0.01em;
+  word-spacing: -0.05em;
+}
+
+/* Specific improvements for select dropdowns */
+html[lang="fa"] .MuiSelect-select,
+html[lang="ar"] .MuiSelect-select {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+/* Fix for dialog titles with Persian fonts */
+html[lang="fa"] .MuiDialogTitle-root,
+html[lang="ar"] .MuiDialogTitle-root {
+  font-family: inherit !important;
+  font-weight: 700 !important;
+}
+
+/* Fix for tooltips with Persian fonts */
+html[lang="fa"] .MuiTooltip-tooltip,
+html[lang="ar"] .MuiTooltip-tooltip {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+}
+
+/* Fix for snackbar text with Persian fonts */
+html[lang="fa"] .MuiSnackbarContent-message,
+html[lang="ar"] .MuiSnackbarContent-message {
+  font-family: inherit !important;
 }
