@@ -1,4 +1,5 @@
 import CloseIcon from "@mui/icons-material/Close";
+import DragHandleIcon from "@mui/icons-material/DragHandle";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import SearchIcon from "@mui/icons-material/Search";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
@@ -25,11 +26,41 @@ import {
   TableRow,
   TableSortLabel,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import { FC, ReactNode, useEffect, useState } from "react";
+import React, { FC, ReactNode, useEffect, useState } from "react";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from "react-beautiful-dnd";
 import { useSubmissions } from "../hooks/useSubmissions";
 import { ColumnDefinition, TableData } from "../types/form";
+
+// StrictModeDroppable component to work with React 18 StrictMode
+const StrictModeDroppable = ({
+  children,
+  ...props
+}: React.ComponentProps<typeof Droppable>) => {
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    const animation = requestAnimationFrame(() => setEnabled(true));
+    return () => {
+      cancelAnimationFrame(animation);
+      setEnabled(false);
+    };
+  }, []);
+
+  if (!enabled) {
+    return null;
+  }
+
+  // Make sure we're passing all props correctly without modifying any types
+  return <Droppable {...props}>{children}</Droppable>;
+};
 
 interface SubmissionListViewProps {
   initialVisibleColumns?: string[];
@@ -47,6 +78,9 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
   );
   const [searchText, setSearchText] = useState("");
   const [filterField, setFilterField] = useState<string | null>(null);
+  const [orderedVisibleColumns, setOrderedVisibleColumns] = useState<
+    ColumnDefinition[]
+  >([]);
 
   const {
     submissions,
@@ -80,6 +114,14 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
       }
     }
   }, [columns, initialVisibleColumns, visibleColumnIds.length]);
+
+  // Update ordered visible columns when visible column IDs change
+  useEffect(() => {
+    const newOrderedColumns = columns.filter((col) =>
+      visibleColumnIds.includes(col.id)
+    );
+    setOrderedVisibleColumns(newOrderedColumns);
+  }, [visibleColumnIds, columns]);
 
   // Apply search filter
   useEffect(() => {
@@ -130,6 +172,32 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
   const handleFilterSelect = (column: ColumnDefinition) => {
     setFilterField(column.accessor);
     setFilterMenuAnchor(null);
+  };
+
+  const handleDragEnd = (result: DropResult) => {
+    // Dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    const reorder = (
+      list: ColumnDefinition[],
+      startIndex: number,
+      endIndex: number
+    ) => {
+      const result = Array.from(list);
+      const [removed] = result.splice(startIndex, 1);
+      result.splice(endIndex, 0, removed);
+      return result;
+    };
+
+    const reorderedColumns = reorder(
+      orderedVisibleColumns,
+      result.source.index,
+      result.destination.index
+    );
+
+    setOrderedVisibleColumns(reorderedColumns);
   };
 
   const renderCellContent = (
@@ -192,11 +260,6 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
   ) => {
     handleLimitChange(parseInt(event.target.value, 10));
   };
-
-  // Get only the visible columns in their original order
-  const visibleColumns = columns.filter((col) =>
-    visibleColumnIds.includes(col.id)
-  );
 
   if (error) {
     return (
@@ -365,53 +428,114 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
             </Box>
           ) : (
             <Table stickyHeader aria-label="submissions table">
-              <TableHead>
-                <TableRow>
-                  {visibleColumns.map((column) => (
-                    <TableCell key={column.id}>
-                      {column.sortable ? (
-                        <TableSortLabel
-                          active={sort === column.accessor}
-                          direction={sort === column.accessor ? order : "asc"}
-                          onClick={() => handleSortChange(column.accessor)}
-                        >
-                          {column.label}
-                        </TableSortLabel>
-                      ) : (
-                        column.label
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {submissions.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={visibleColumns.length} align="center">
-                      No submissions found.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  submissions.map((submission) => (
-                    <TableRow
-                      hover
-                      key={submission.id}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              <DragDropContext onDragEnd={handleDragEnd}>
+                <StrictModeDroppable
+                  droppableId="droppable-columns"
+                  direction="horizontal"
+                  isDropDisabled={false}
+                  isCombineEnabled={false}
+                  ignoreContainerClipping={false}
+                >
+                  {(provided) => (
+                    <TableHead
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
                     >
-                      {visibleColumns.map((column) => (
-                        <TableCell key={`${submission.id}-${column.id}`}>
-                          {renderCellContent(submission, column)}
-                        </TableCell>
-                      ))}
+                      <TableRow>
+                        {orderedVisibleColumns.map((column, index) => (
+                          <Draggable
+                            key={column.id}
+                            draggableId={column.id}
+                            index={index}
+                          >
+                            {(provided, snapshot) => (
+                              <TableCell
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                component="th"
+                                scope="col"
+                                style={{
+                                  ...provided.draggableProps.style,
+                                  backgroundColor: snapshot.isDragging
+                                    ? "rgba(63, 81, 181, 0.1)"
+                                    : undefined,
+                                }}
+                              >
+                                <Box
+                                  sx={{ display: "flex", alignItems: "center" }}
+                                >
+                                  <Tooltip title="Drag to reorder column">
+                                    <Box
+                                      {...provided.dragHandleProps}
+                                      sx={{
+                                        mr: 1,
+                                        cursor: "grab",
+                                        display: "flex",
+                                        alignItems: "center",
+                                      }}
+                                    >
+                                      <DragHandleIcon fontSize="small" />
+                                    </Box>
+                                  </Tooltip>
+                                  {column.sortable ? (
+                                    <TableSortLabel
+                                      active={sort === column.accessor}
+                                      direction={
+                                        sort === column.accessor ? order : "asc"
+                                      }
+                                      onClick={() =>
+                                        handleSortChange(column.accessor)
+                                      }
+                                    >
+                                      {column.label}
+                                    </TableSortLabel>
+                                  ) : (
+                                    column.label
+                                  )}
+                                </Box>
+                              </TableCell>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </TableRow>
+                    </TableHead>
+                  )}
+                </StrictModeDroppable>
+                <TableBody>
+                  {submissions.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={orderedVisibleColumns.length}
+                        align="center"
+                      >
+                        No submissions found.
+                      </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
+                  ) : (
+                    submissions.map((submission) => (
+                      <TableRow
+                        hover
+                        key={submission.id}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        {orderedVisibleColumns.map((column) => (
+                          <TableCell key={`${submission.id}-${column.id}`}>
+                            {renderCellContent(submission, column)}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </DragDropContext>
             </Table>
           )}
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[2, 5, 10, 25]}
+          rowsPerPageOptions={[2, 10, 25, 50]}
           component="div"
           count={total}
           rowsPerPage={pageSize}
