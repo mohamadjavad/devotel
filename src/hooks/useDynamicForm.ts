@@ -1,5 +1,5 @@
 import { useFormik } from "formik";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import * as Yup from "yup";
 import { getStates, submitForm } from "../services/api";
@@ -34,6 +34,12 @@ export const useDynamicForm = ({
     countryField?: string;
     stateField?: string;
   }>({});
+
+  // Reference to store the previous country value to avoid unnecessary API calls
+  const prevCountryRef = useRef<string | null>(null);
+
+  // Reference to store the debounce timer
+  const debounceTimerRef = useRef<number | null>(null);
 
   // Function to retrieve saved draft from localStorage
   const getSavedDraft = (): FormData => {
@@ -367,37 +373,57 @@ export const useDynamicForm = ({
       const countryValue = formik.values[countryStateFields.countryField];
 
       if (countryValue && typeof countryValue === "string") {
-        try {
-          const states = await getStates(countryValue);
-          if (states.length > 0) {
-            setDynamicOptions((prev) => ({
-              ...prev,
-              [countryStateFields.stateField!]: states,
-            }));
+        // Skip API call if country hasn't changed
+        if (prevCountryRef.current === countryValue) return;
 
-            // If the current state value is not in the new states list, clear it
-            const currentStateValue =
-              formik.values[countryStateFields.stateField];
-            if (currentStateValue) {
-              const isValidState = states.some(
-                (state) => state.value === currentStateValue
-              );
+        // Clear any existing timer
+        if (debounceTimerRef.current) {
+          clearTimeout(debounceTimerRef.current);
+        }
 
-              if (!isValidState) {
-                formik.setFieldValue(countryStateFields.stateField, "");
+        // Set a new timer for debouncing
+        debounceTimerRef.current = setTimeout(async () => {
+          try {
+            prevCountryRef.current = countryValue;
+            const states = await getStates(countryValue);
+
+            if (states.length > 0) {
+              setDynamicOptions((prev) => ({
+                ...prev,
+                [countryStateFields.stateField!]: states,
+              }));
+
+              // If the current state value is not in the new states list, clear it
+              const currentStateValue =
+                formik.values[countryStateFields.stateField!];
+              if (currentStateValue) {
+                const isValidState = states.some(
+                  (state) => state.value === currentStateValue
+                );
+
+                if (!isValidState) {
+                  formik.setFieldValue(countryStateFields.stateField!, "");
+                }
               }
             }
+          } catch (error) {
+            console.error(
+              `Error fetching states for country ${countryValue}:`,
+              error
+            );
           }
-        } catch (error) {
-          console.error(
-            `Error fetching states for country ${countryValue}:`,
-            error
-          );
-        }
+        }, 300); // 300ms debounce time
       }
     };
 
     fetchStateOptions();
+
+    // Clean up the timeout when component unmounts or dependencies change
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
   }, [formStructure, formik.values, countryStateFields]);
 
   // Auto-save form data periodically to localStorage
