@@ -107,6 +107,37 @@
     "nextPage": "صفحه بعد",
     "previousPage": "صفحه قبل"
   },
+  "tooltips": {
+    "dragToReorderColumn": "برای تغییر ترتیب ستون، بکشید"
+  },
+  "table": {
+    "columns": {
+      "id": "شناسه",
+      "name": "نام",
+      "email": "ایمیل",
+      "phone": "تلفن",
+      "status": "وضعیت",
+      "type": "نوع",
+      "date": "تاریخ",
+      "submitted_at": "تاریخ ارسال",
+      "updated_at": "تاریخ بروزرسانی",
+      "created_at": "تاریخ ایجاد",
+      "insurance_type": "نوع بیمه",
+      "first_name": "نام",
+      "last_name": "نام خانوادگی",
+      "address": "آدرس",
+      "city": "شهر",
+      "state": "استان",
+      "country": "کشور",
+      "zip_code": "کد پستی",
+      "birth_date": "تاریخ تولد",
+      "policy_number": "شماره بیمه نامه",
+      "actions": "عملیات",
+      "full_name": "نام و نام خانوادگی",
+      "age": "سن",
+      "gender": "جنسیت"
+    }
+  },
   "formFields": {
     "country": "کشور",
     "state": "استان/ایالت",

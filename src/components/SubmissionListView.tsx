@@ -203,6 +203,28 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
     setOrderedVisibleColumns(reorderedColumns);
   };
 
+  // Translate column labels
+  const getTranslatedColumnLabel = (label: string) => {
+    // First, check for exact matches from API response
+    if (label === "Full Name")
+      return t("table.columns.full_name", { defaultValue: "Full Name" });
+    if (label === "Age") return t("table.columns.age", { defaultValue: "Age" });
+    if (label === "Gender")
+      return t("table.columns.gender", { defaultValue: "Gender" });
+    if (label === "Insurance Type")
+      return t("table.columns.insurance_type", {
+        defaultValue: "Insurance Type",
+      });
+    if (label === "City")
+      return t("table.columns.city", { defaultValue: "City" });
+
+    // Then fall back to standard column translation pattern
+    const translationKey = `table.columns.${label
+      .toLowerCase()
+      .replace(/\s+/g, "_")}`;
+    return t(translationKey, { defaultValue: label });
+  };
+
   const renderCellContent = (
     submission: TableData,
     column: ColumnDefinition
@@ -325,7 +347,7 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
           <Box sx={{ mb: 2 }}>
             <TextField
               label={t("submissions.search")}
-              variant="outlined"
+              variant="standard"
               fullWidth
               value={searchText}
               onChange={handleSearchChange}
@@ -442,7 +464,11 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
               <CircularProgress />
             </Box>
           ) : (
-            <Table stickyHeader aria-label="submissions table">
+            <Table
+              sx={{ direction: "ltr" }}
+              stickyHeader
+              aria-label="submissions table"
+            >
               <DragDropContext onDragEnd={handleDragEnd}>
                 <StrictModeDroppable
                   droppableId="droppable-columns"
@@ -479,7 +505,11 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
                                 <Box
                                   sx={{ display: "flex", alignItems: "center" }}
                                 >
-                                  <Tooltip title="Drag to reorder column">
+                                  <Tooltip
+                                    title={t("tooltips.dragToReorderColumn", {
+                                      defaultValue: "Drag to reorder column",
+                                    })}
+                                  >
                                     <Box
                                       {...provided.dragHandleProps}
                                       sx={{
@@ -502,10 +532,10 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
                                         handleSortChange(column.accessor)
                                       }
                                     >
-                                      {column.label}
+                                      {getTranslatedColumnLabel(column.label)}
                                     </TableSortLabel>
                                   ) : (
-                                    column.label
+                                    getTranslatedColumnLabel(column.label)
                                   )}
                                 </Box>
                               </TableCell>
@@ -537,7 +567,10 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
                         }}
                       >
                         {orderedVisibleColumns.map((column) => (
-                          <TableCell key={`${submission.id}-${column.id}`}>
+                          <TableCell
+                            key={`${submission.id}-${column.id}`}
+                            sx={{ textAlign: "left", direction: "ltr" }}
+                          >
                             {renderCellContent(submission, column)}
                           </TableCell>
                         ))}
