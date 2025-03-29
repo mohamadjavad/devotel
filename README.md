@@ -53,97 +53,65 @@ export default tseslint.config({
 });
 ```
 
-# Devotel Insurance Portal
+# Devotel Insurance Application
 
-An insurance application portal that allows users to apply for different types of insurance and view their submissions.
+A modern web application for managing insurance applications with multi-language support, form autosave, and dynamic forms.
 
-## Overview
+## Features
 
-This application supports:
+- 🌐 Multi-language support (English, Farsi) with RTL layout support
+- 📝 Dynamic form generation based on server configurations
+- 💾 Form autosave functionality
+- 📱 Responsive design for all devices
+- 🧪 Comprehensive test suite using React Testing Library
 
-- Dynamic form rendering based on form structure from the API
-- Country-state relationship handling that fetches states based on selected country
-- Form validation with real-time feedback
-- Submission management with sorting, filtering, and pagination
-- Responsive design using Material UI
+## Tech Stack
 
-## API Response Format
-
-The submissions API returns data in the following format:
-
-```json
-{
-  "columns": ["Full Name", "Age", "Gender", "Insurance Type", "City"],
-  "data": [
-    {
-      "id": "1",
-      "Full Name": "John Doe",
-      "Age": 28,
-      "Gender": "Male",
-      "Insurance Type": "Health",
-      "City": "New York"
-    },
-    {
-      "id": "2",
-      "Full Name": "Jane Smith",
-      "Age": 32,
-      "Gender": "Female",
-      "Insurance Type": "Home",
-      "City": "Los Angeles"
-    }
-  ]
-}
-```
-
-## Client-Side Data Handling
-
-The application implements client-side:
-
-- Pagination
-- Sorting
-- Filtering
-- Column visibility control
-
-This provides a responsive user experience without requiring multiple API calls.
-
-## Environment Variables
-
-The application uses environment variables to configure different settings:
-
-- `VITE_API_BASE_URL`: The base URL for API requests (e.g., "https://assignment.devotel.io/api")
-
-### Setting Up Environment Variables
-
-1. Copy the `.env.example` file to create a new `.env` file:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Edit the `.env` file and set the appropriate values for your environment.
-
-3. For production builds, you can create a `.env.production` file with production-specific values.
-
-Note: Environment files (`.env`, `.env.production`, etc.) are excluded from Git by default for security reasons.
+- React 19 with TypeScript
+- Material UI 7.0
+- React Query for data fetching
+- Formik and Yup for form management and validation
+- i18next for internationalization
+- React Router for navigation
+- Vite for fast development and bundling
+- Jest and React Testing Library for testing
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (version 14 or higher)
-- npm (version 7 or higher)
+- Node.js (version 18 or higher)
+- npm or yarn
 
 ### Installation
 
-```bash
-npm install --legacy-peer-deps
-```
+1. Clone the repository:
+
+   ```bash
+   git clone [repository-url]
+   cd devotel
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Create a `.env` file in the root directory with the following content:
+   ```
+   VITE_API_BASE_URL=https://assignment.devotel.io/api
+   ```
 
 ### Development
+
+Start the development server:
 
 ```bash
 npm run dev
 ```
+
+The application will be available at `http://localhost:5173`.
 
 ### Building for Production
 
@@ -151,23 +119,143 @@ npm run dev
 npm run build
 ```
 
-## Available Scripts
+The built files will be in the `dist` directory.
 
-In the project directory, you can run:
+## Testing
 
-### `npm run dev`
+The project uses Jest and React Testing Library for testing. The tests focus on user interactions and component behavior rather than implementation details.
 
-Runs the app in the development mode.\
-Open [http://localhost:5173](http://localhost:5173) to view it in your browser.
+### Running Tests
 
-### `npm run build`
+Run all tests:
 
-Builds the app for production to the `dist` folder.
+```bash
+npm test
+```
 
-### `npm run lint`
+Run tests in watch mode:
 
-Runs the linter to check for code quality issues.
+```bash
+npm run test:watch
+```
 
-### `npm run preview`
+Generate test coverage report:
 
-Previews the production build locally.
+```bash
+npm run test:coverage
+```
+
+Run a specific test file:
+
+```bash
+npm test -- src/components/__tests__/LanguageSelector.test.tsx
+```
+
+### Test Structure
+
+- `src/__tests__/`: Application-level tests
+- `src/components/__tests__/`: Component-specific tests
+- `src/__mocks__/`: Mock files for testing
+
+### Testing Approach
+
+The tests follow these principles:
+
+1. **Component Testing**: Each component has its own test file focusing on its functionality
+2. **User-Centric Testing**: Tests simulate real user interactions
+3. **Isolation**: Components are isolated using mocks for dependencies
+4. **Coverage**: Tests cover success and error cases
+
+### Test Examples
+
+#### Component Rendering Tests
+
+```tsx
+test("renders form structure when loaded", () => {
+  render(<DynamicForm formStructure={mockFormStructure} isLoading={false} />);
+
+  // Form title should be visible
+  expect(screen.getByText("Test Form")).toBeInTheDocument();
+
+  // Form fields should be rendered
+  expect(screen.getByLabelText(/Full Name/i)).toBeInTheDocument();
+  expect(screen.getByLabelText(/Email Address/i)).toBeInTheDocument();
+});
+```
+
+#### User Interaction Tests
+
+```tsx
+test("changes language when a different option is selected", () => {
+  render(<LanguageSelector />);
+
+  // Open the dropdown
+  const selectElement = screen.getByRole("combobox");
+  fireEvent.mouseDown(selectElement);
+
+  // Select Farsi option
+  const farsiOption = screen.getByText("Farsi");
+  fireEvent.click(farsiOption);
+
+  // Check if changeLanguage was called with the correct language code
+  expect(mockChangeLanguage).toHaveBeenCalledWith("fa");
+});
+```
+
+#### Async Tests
+
+```tsx
+test("handles form submission", async () => {
+  render(
+    <DynamicForm
+      formStructure={mockFormStructure}
+      isLoading={false}
+      onSubmitSuccess={jest.fn()}
+    />
+  );
+
+  // Fill out the form
+  const nameInput = screen.getByLabelText(/Full Name/i);
+  const emailInput = screen.getByLabelText(/Email Address/i);
+
+  await userEvent.type(nameInput, "John Doe");
+  await userEvent.type(emailInput, "john@example.com");
+
+  // Submit the form
+  const submitButton = screen.getByRole("button", { name: /submit/i });
+  fireEvent.click(submitButton);
+
+  // Validate form submission was triggered
+  await waitFor(() => {
+    expect(mockFormikInstance.submitForm).toHaveBeenCalled();
+  });
+});
+```
+
+## Project Structure
+
+```
+src/
+├── __mocks__/          # Mock files for testing
+├── __tests__/          # Application-level tests
+├── components/         # React components
+│   └── __tests__/      # Component tests
+├── hooks/              # Custom React hooks
+├── services/           # API services
+├── types/              # TypeScript type definitions
+├── App.tsx             # Main app component
+├── index.css           # Global styles
+├── main.tsx            # Application entry point
+└── setupTests.ts       # Test setup
+```
+
+## Contributing
+
+1. Create a feature branch (`git checkout -b feature/amazing-feature`)
+2. Commit your changes (`git commit -m 'Add some amazing feature'`)
+3. Push to the branch (`git push origin feature/amazing-feature`)
+4. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License.
