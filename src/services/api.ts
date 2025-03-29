@@ -13,17 +13,28 @@ const api = axios.create({
 
 export const getFormStructure = async (
   formType?: string
-): Promise<FormStructure> => {
+): Promise<{
+  selectedForm: FormStructure;
+  allForms: FormStructure[];
+}> => {
   try {
     const response = await api.get("/insurance/forms");
+    const allForms = response.data;
+
     // Find the specific form type or return the first one if no type specified
+    let selectedForm;
     if (formType) {
-      const form = response.data.find(
-        (form: FormStructure) => form.formId === formType
-      );
-      return form || response.data[0];
+      selectedForm =
+        allForms.find((form: FormStructure) => form.formId === formType) ||
+        allForms[0];
+    } else {
+      selectedForm = allForms[0];
     }
-    return response.data[0];
+
+    return {
+      selectedForm,
+      allForms,
+    };
   } catch (error) {
     console.error("Error fetching form structure:", error);
     throw error;

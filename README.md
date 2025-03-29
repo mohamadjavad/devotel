@@ -136,7 +136,7 @@ Note: Environment files (`.env`, `.env.production`, etc.) are excluded from Git 
 ### Installation
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
 ### Development
