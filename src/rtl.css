@@ -26,24 +26,24 @@
 }
 
 /* Fix label animation when focused in RTL mode */
-/* [dir="rtl"] .MuiInputLabel-shrink {
+[dir="rtl"] .MuiInputLabel-shrink {
   transform: translate(14px, -9px) scale(0.75) !important;
   transform-origin: top right !important;
-} */
+}
 
 /* RTL Form Control Labels */
-/* [dir="rtl"] .MuiFormControlLabel-root {
+[dir="rtl"] .MuiFormControlLabel-root {
   margin-left: 0;
   margin-right: -11px;
-} */
+}
 
 /* RTL Form labels */
-/* [dir="rtl"] .MuiFormLabel-root {
+[dir="rtl"] .MuiFormLabel-root {
   right: 0;
   left: auto;
   transform-origin: right top;
   text-align: right;
-} */
+}
 
 /* RTL Input Adornment */
 [dir="rtl"] .MuiInputAdornment-root {
@@ -134,15 +134,16 @@
 }
 
 /* Fix TextField notched outline in RTL mode */
-/* [dir="rtl"] .MuiOutlinedInput-notchedOutline {
+[dir="rtl"] .MuiOutlinedInput-notchedOutline {
   text-align: right;
   direction: rtl;
+  margin-right: -12px;
 }
 
 [dir="rtl"] .MuiOutlinedInput-notchedOutline legend {
   text-align: right;
   direction: rtl;
-} */
+}
 
 /* Improve RTL input field font rendering */
 [dir="rtl"] .MuiOutlinedInput-input,
@@ -153,7 +154,7 @@
 }
 
 /* Fix Select in RTL mode */
-/* [dir="rtl"] .MuiNativeSelect-select,
+[dir="rtl"] .MuiNativeSelect-select,
 [dir="rtl"] .MuiSelect-select {
   padding-right: 12px !important;
   padding-left: 32px !important;
@@ -163,7 +164,7 @@
 [dir="rtl"] .MuiSelect-icon {
   right: auto !important;
   left: 7px !important;
-} */
+}
 
 /* Font for Farsi language */
 html[lang="fa"] body {

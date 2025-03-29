@@ -67,7 +67,8 @@
     "max": "باید حداکثر {{max}} باشد",
     "pattern": "فرمت نامعتبر است",
     "minLength": "باید حداقل {{min}} کاراکتر باشد",
-    "maxLength": "باید حداکثر {{max}} کاراکتر باشد"
+    "maxLength": "باید حداکثر {{max}} کاراکتر باشد",
+    "formHasErrors": "لطفاً خطاهای فرم را برطرف کنید"
   },
   "languageSelector": {
     "english": "English",
@@ -118,7 +119,40 @@
     "zipCode": "کد پستی",
     "birthDate": "تاریخ تولد",
     "gender": "جنسیت",
-    "occupation": "شغل"
+    "occupation": "شغل",
+
+    "first_name": "نام",
+    "last_name": "نام خانوادگی",
+    "dob": "تاریخ تولد",
+    "personal_info": "اطلاعات شخصی",
+    "health_info": "اطلاعات سلامت",
+    "smoker": "آیا سیگار می‌کشید؟",
+    "smoking_frequency": "چقدر سیگار می‌کشید؟",
+
+    "home_owner": "آیا شما صاحب خانه هستید؟",
+    "property_type": "نوع ملک",
+    "home_value": "ارزش تخمینی خانه (دلار)",
+    "has_security_system": "آیا سیستم امنیتی خانه دارید؟",
+    "security_system_type": "نوع سیستم امنیتی",
+    "fire_safety": "آیا اقدامات ایمنی آتش دارید؟",
+    "home_address": "آدرس منزل",
+    "street": "خیابان",
+    "zip_code": "کد پستی",
+    "insurance_coverage": "نوع پوشش",
+
+    "car_owner": "آیا شما مالک اصلی خودرو هستید؟",
+    "vehicle_info": "اطلاعات خودرو",
+    "car_make": "سازنده خودرو",
+    "car_model": "مدل خودرو",
+    "car_year": "سال ساخت",
+    "car_usage": "نحوه استفاده از خودرو",
+    "driving_record": "سوابق رانندگی",
+    "accidents_last_5_years": "آیا در ۵ سال گذشته تصادف داشته‌اید؟",
+    "accident_count": "چند تصادف؟",
+    "license_suspensions": "آیا تا به حال گواهینامه شما تعلیق شده است؟",
+    "insurance_history": "ارائه دهنده بیمه قبلی",
+    "desired_coverage": "نوع پوشش مورد نظر",
+    "roadside_assistance": "آیا امداد جاده‌ای می‌خواهید؟"
   },
   "chipLabels": {
     "health": "سلامت",
@@ -139,6 +173,129 @@
     "business": "تجاری",
     "basic": "پایه",
     "standard": "استاندارد",
-    "premium": "ویژه"
+    "premium": "ویژه",
+
+    "USA": "ایالات متحده",
+    "Canada": "کانادا",
+    "Germany": "آلمان",
+    "France": "فرانسه",
+
+    "Occasionally": "گاهی اوقات",
+    "Daily": "روزانه",
+    "Heavy": "شدید",
+
+    "House": "خانه",
+    "Apartment": "آپارتمان",
+    "Condo": "کاندو",
+
+    "Monitored": "تحت نظارت",
+    "Unmonitored": "بدون نظارت",
+    "Smart Home System": "سیستم خانه هوشمند",
+
+    "Smoke Detectors": "آشکارسازهای دود",
+    "Fire Extinguishers": "کپسول‌های آتش‌نشانی",
+    "Sprinkler System": "سیستم اسپرینکلر",
+
+    "Basic": "پایه",
+    "Comprehensive": "جامع",
+    "Premium": "ویژه",
+
+    "Personal": "شخصی",
+    "Commercial": "تجاری",
+    "Rideshare": "اشتراک سواری",
+
+    "None": "هیچکدام",
+    "State Farm": "استیت فارم",
+    "Geico": "جایکو",
+    "Progressive": "پروگرسیو",
+    "Allstate": "آل‌استیت",
+
+    "Liability Only": "فقط مسئولیت",
+    "Full Coverage": "پوشش کامل",
+    "Comprehensive": "جامع",
+
+    "true": "بله",
+    "false": "خیر",
+    "True": "بله",
+    "False": "خیر",
+
+    "standard": "استاندارد",
+
+    "1": "۱",
+    "2": "۲",
+    "3": "۳",
+    "4": "۴",
+    "5": "۵",
+
+    "smoker": {
+      "yes": "بله، سیگار می‌کشم",
+      "no": "خیر، سیگار نمی‌کشم"
+    },
+
+    "smoking_frequency": {
+      "Occasionally": "گاهی اوقات",
+      "Daily": "روزانه",
+      "Heavy": "شدید"
+    },
+
+    "home_owner": {
+      "yes": "بله، صاحب خانه هستم",
+      "no": "خیر، مستأجر هستم"
+    },
+
+    "property_type": {
+      "House": "خانه ویلایی",
+      "Apartment": "آپارتمان",
+      "Condo": "کاندو"
+    },
+
+    "has_security_system": {
+      "yes": "بله، دارم",
+      "no": "خیر، ندارم"
+    },
+
+    "security_system_type": {
+      "Monitored": "تحت نظارت",
+      "Unmonitored": "بدون نظارت",
+      "Smart Home System": "سیستم خانه هوشمند"
+    },
+
+    "car_owner": {
+      "yes": "بله، مالک اصلی هستم",
+      "no": "خیر، مالک اصلی نیستم"
+    },
+
+    "car_usage": {
+      "Personal": "شخصی",
+      "Commercial": "تجاری",
+      "Rideshare": "اشتراک سواری"
+    },
+
+    "accidents_last_5_years": {
+      "yes": "بله، تصادف داشته‌ام",
+      "no": "خیر، تصادف نداشته‌ام"
+    },
+
+    "license_suspensions": {
+      "yes": "بله، تعلیق شده",
+      "no": "خیر، تعلیق نشده"
+    },
+
+    "roadside_assistance": {
+      "yes": "بله، می‌خواهم",
+      "no": "خیر، نمی‌خواهم"
+    },
+
+    "insurance_coverage": {
+      "Basic": "پایه",
+      "Comprehensive": "جامع",
+      "Premium": "ویژه"
+    },
+
+    "desired_coverage": {
+      "Liability Only": "فقط مسئولیت",
+      "Full Coverage": "پوشش کامل",
+      "Comprehensive": "جامع"
+    }
   }
 }
