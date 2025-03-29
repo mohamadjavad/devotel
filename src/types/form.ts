@@ -19,8 +19,17 @@ export interface Validation {
 export interface FormField {
   id: string;
   label: string;
-  type: "text" | "number" | "select" | "radio" | "checkbox" | "date" | "group";
+  type:
+    | "text"
+    | "number"
+    | "select"
+    | "radio"
+    | "checkbox"
+    | "date"
+    | "group"
+    | "email";
   required?: boolean;
+  placeholder?: string;
   options?: (string | FormFieldOption)[];
   visibility?: Visibility;
   validation?: Validation;
@@ -38,7 +47,8 @@ export interface FormSection {
 export interface FormStructure {
   formId: string;
   title: string;
-  fields: FormField[];
+  fields?: FormField[];
+  sections?: FormSection[];
 }
 
 export interface FormData {

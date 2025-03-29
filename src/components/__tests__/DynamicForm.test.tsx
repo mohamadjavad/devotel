@@ -19,40 +19,40 @@ describe("DynamicForm Component", () => {
   const mockFormStructure: FormStructure = {
     formId: "test-form",
     title: "Test Form",
-    sections: [
+    fields: [
       {
-        id: "personal-info",
-        title: "Personal Information",
-        fields: [
-          {
-            id: "fullName",
-            type: "text",
-            label: "Full Name",
-            required: true,
-            placeholder: "Enter your full name",
-          },
-          {
-            id: "email",
-            type: "email",
-            label: "Email Address",
-            required: true,
-            placeholder: "Enter your email address",
-          },
-        ],
+        id: "fullName",
+        type: "text",
+        label: "Full Name",
+        required: true,
+        placeholder: "Enter your full name",
+      },
+      {
+        id: "email",
+        type: "email",
+        label: "Email Address",
+        required: true,
+        placeholder: "Enter your email address",
       },
     ],
   };
 
+  interface MockFormikValues {
+    fullName: string;
+    email: string;
+  }
+
   const mockFormikInstance = {
-    values: { fullName: "", email: "" },
+    values: { fullName: "", email: "" } as MockFormikValues,
     errors: {},
     touched: {},
     handleSubmit: jest.fn(),
-    handleChange: jest.fn((e) => {
-      mockFormikInstance.values[e.target.name] = e.target.value;
+    handleChange: jest.fn((e: { target: { name: string; value: string } }) => {
+      mockFormikInstance.values[e.target.name as keyof MockFormikValues] =
+        e.target.value;
     }),
     handleBlur: jest.fn(),
-    setFieldValue: jest.fn((field, value) => {
+    setFieldValue: jest.fn((field: keyof MockFormikValues, value: string) => {
       mockFormikInstance.values[field] = value;
     }),
     setTouched: jest.fn(),
@@ -72,7 +72,7 @@ describe("DynamicForm Component", () => {
   };
 
   const mockUseLanguageReturn = {
-    t: (key: string, options?: any) => {
+    t: (key: string, options?: { defaultValue?: string }) => {
       if (options?.defaultValue) return options.defaultValue;
       return key;
     },

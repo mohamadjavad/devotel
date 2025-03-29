@@ -155,6 +155,8 @@ npm test -- src/components/__tests__/LanguageSelector.test.tsx
 
 - `src/__tests__/`: Application-level tests
 - `src/components/__tests__/`: Component-specific tests
+- `src/hooks/__tests__/`: Custom hooks tests
+- `src/services/__tests__/`: API service tests
 - `src/__mocks__/`: Mock files for testing
 
 ### Testing Approach
@@ -162,9 +164,11 @@ npm test -- src/components/__tests__/LanguageSelector.test.tsx
 The tests follow these principles:
 
 1. **Component Testing**: Each component has its own test file focusing on its functionality
-2. **User-Centric Testing**: Tests simulate real user interactions
-3. **Isolation**: Components are isolated using mocks for dependencies
-4. **Coverage**: Tests cover success and error cases
+2. **Custom Hook Testing**: Hooks are tested with the `renderHook` utility to verify their behavior
+3. **Service Testing**: API services are tested by mocking external dependencies
+4. **User-Centric Testing**: Tests simulate real user interactions
+5. **Isolation**: Components are isolated using mocks for dependencies
+6. **Coverage**: Tests cover success and error cases
 
 ### Test Examples
 
@@ -202,35 +206,70 @@ test("changes language when a different option is selected", () => {
 });
 ```
 
-#### Async Tests
+#### Custom Hook Tests
 
 ```tsx
-test("handles form submission", async () => {
-  render(
-    <DynamicForm
-      formStructure={mockFormStructure}
-      isLoading={false}
-      onSubmitSuccess={jest.fn()}
-    />
-  );
-
-  // Fill out the form
-  const nameInput = screen.getByLabelText(/Full Name/i);
-  const emailInput = screen.getByLabelText(/Email Address/i);
-
-  await userEvent.type(nameInput, "John Doe");
-  await userEvent.type(emailInput, "john@example.com");
-
-  // Submit the form
-  const submitButton = screen.getByRole("button", { name: /submit/i });
-  fireEvent.click(submitButton);
-
-  // Validate form submission was triggered
-  await waitFor(() => {
-    expect(mockFormikInstance.submitForm).toHaveBeenCalled();
+test("returns current language from hook", () => {
+  // Mock the i18n hook to return 'en' as the language
+  (useTranslation as jest.Mock).mockReturnValue({
+    i18n: {
+      language: "en",
+      changeLanguage: mockChangeLanguage,
+    },
+    t: (key: string) => key,
   });
+
+  const { result } = renderHook(() => useLanguage());
+
+  expect(result.current.currentLanguage).toBe("en");
+  expect(result.current.isRTL).toBe(false);
 });
 ```
+
+#### API Service Tests
+
+```tsx
+test("fetches submissions successfully", async () => {
+  // Mock API response
+  const mockSubmissionsData = {
+    columns: ["Full Name", "Email", "Status"],
+    data: [
+      {
+        id: "1",
+        "Full Name": "John Doe",
+        Email: "john@example.com",
+        Status: "Approved",
+      },
+    ],
+  };
+
+  (getSubmissions as jest.Mock).mockResolvedValueOnce(mockSubmissionsData);
+
+  const result = await getSubmissions();
+
+  // Assertions
+  expect(getSubmissions).toHaveBeenCalled();
+  expect(result).toEqual(mockSubmissionsData);
+});
+```
+
+### Testing Catalog
+
+#### Hooks Tested
+
+- **useLanguage**: Tests language selection, RTL detection, and translation functionality
+- **useFormStructure**: Tests form structure fetching, error handling, and form selection
+- **useDynamicForm**: Tests form initialization, submission, autosave functionality, and field visibility
+- **useSubmissions**: Tests submissions fetching, filtering, sorting, and pagination
+
+#### API Services Tested
+
+- **getFormStructure**: Tests retrieving form structures with/without specific form type
+- **submitForm**: Tests form submission success and error handling
+- **getSubmissions**: Tests fetching submissions data and error handling
+- **getStates**: Tests fetching states for a country and handling invalid responses
+
+These tests ensure that all key functionalities of the application are verified, providing confidence that the app will work correctly for users.
 
 ## Project Structure
 
@@ -241,7 +280,9 @@ src/
 ├── components/         # React components
 │   └── __tests__/      # Component tests
 ├── hooks/              # Custom React hooks
+│   └── __tests__/      # Hook tests
 ├── services/           # API services
+│   └── __tests__/      # Service tests
 ├── types/              # TypeScript type definitions
 ├── App.tsx             # Main app component
 ├── index.css           # Global styles
