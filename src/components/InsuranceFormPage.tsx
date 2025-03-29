@@ -1,18 +1,22 @@
 import { Alert, Box, Paper, Tab, Tabs } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import { useFormStructure } from "../hooks/useFormStructure";
+import { useLanguage } from "../hooks/useLanguage";
 import { DynamicForm } from "./DynamicForm";
 
-const INSURANCE_TYPES = [
-  { id: "health_insurance_application", label: "Health Insurance" },
-  { id: "home_insurance_application", label: "Home Insurance" },
-  { id: "car_insurance_application", label: "Car Insurance" },
-];
-
 export const InsuranceFormPage: FC = () => {
-  const [selectedType, setSelectedType] = useState(INSURANCE_TYPES[0].id);
+  const { t } = useLanguage();
+  const [selectedType, setSelectedType] = useState(
+    "health_insurance_application"
+  );
   const [submissionSuccess, setSubmissionSuccess] = useState(false);
   const [draftKey, setDraftKey] = useState(`form_draft_${selectedType}`);
+
+  const INSURANCE_TYPES = [
+    { id: "health_insurance_application", label: t("insuranceTypes.health") },
+    { id: "home_insurance_application", label: t("insuranceTypes.home") },
+    { id: "car_insurance_application", label: t("insuranceTypes.car") },
+  ];
 
   const { formStructure, isLoading } = useFormStructure({
     formType: selectedType,
@@ -54,7 +58,7 @@ export const InsuranceFormPage: FC = () => {
             maxWidth: "100%",
           }}
         >
-          Your application was submitted successfully!
+          {t("messages.submissionSuccess")}
         </Alert>
       )}
 

@@ -1,5 +1,6 @@
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import * as Yup from "yup";
 import { getStates, submitForm } from "../services/api";
 import { FormData, FormField, FormStructure, Visibility } from "../types/form";
@@ -21,6 +22,7 @@ export const useDynamicForm = ({
   autosaveInterval = 30000, // 30 seconds
   draftKey = "form_draft",
 }: UseDynamicFormProps) => {
+  const { t } = useTranslation();
   const [dynamicOptions, setDynamicOptions] = useState<
     Record<string, { label: string; value: string }[]>
   >({});
@@ -39,7 +41,7 @@ export const useDynamicForm = ({
       const savedDraft = localStorage.getItem(draftKey);
       return savedDraft ? JSON.parse(savedDraft) : {};
     } catch (error) {
-      console.error("Error retrieving draft from localStorage:", error);
+      console.error(t("form.autosaveFailed"), error);
       return {};
     }
   };
@@ -50,7 +52,7 @@ export const useDynamicForm = ({
       localStorage.setItem(draftKey, JSON.stringify(values));
       setLastSaved(new Date());
     } catch (error) {
-      console.error("Error saving draft to localStorage:", error);
+      console.error(t("form.autosaveFailed"), error);
     }
   };
 
@@ -190,97 +192,142 @@ export const useDynamicForm = ({
         // Process nested fields
         processFields(field.fields, schema);
       } else {
-        let fieldSchema: Yup.Schema;
-
         // Set up base schema based on field type
         switch (field.type) {
-          case "text":
-            fieldSchema = Yup.string();
+          case "text": {
+            let fieldSchema = Yup.string();
 
             // Add pattern validation if specified
             if (field.validation?.pattern) {
-              fieldSchema = (fieldSchema as Yup.StringSchema).matches(
+              fieldSchema = fieldSchema.matches(
                 new RegExp(field.validation.pattern),
-                field.validation.message || "Invalid format"
+                field.validation.message || t("validation.pattern")
               );
             }
-            break;
-          case "number":
-            fieldSchema = Yup.number();
-            if (field.validation?.min !== undefined) {
-              fieldSchema = (fieldSchema as Yup.NumberSchema).min(
+
+            // Email validation for email fields
+            if (field.id.toLowerCase().includes("email")) {
+              fieldSchema = fieldSchema.email(t("validation.email"));
+            }
+
+            // Add min/max length validation
+            if (field.validation?.min) {
+              fieldSchema = fieldSchema.min(
                 field.validation.min,
-                field.validation.message ||
-                  `Must be at least ${field.validation.min}`
+                t("validation.minLength", { min: field.validation.min })
+              );
+            }
+            if (field.validation?.max) {
+              fieldSchema = fieldSchema.max(
+                field.validation.max,
+                t("validation.maxLength", { max: field.validation.max })
+              );
+            }
+
+            // Add required validation if specified
+            if (field.required) {
+              fieldSchema = fieldSchema.required(t("validation.required"));
+            }
+
+            schema[field.id] = fieldSchema;
+            break;
+          }
+
+          case "number": {
+            let fieldSchema = Yup.number()
+              .typeError(t("validation.pattern"))
+              .nullable();
+
+            // Add min/max validation
+            if (field.validation?.min !== undefined) {
+              fieldSchema = fieldSchema.min(
+                field.validation.min,
+                t("validation.min", { min: field.validation.min })
               );
             }
             if (field.validation?.max !== undefined) {
-              fieldSchema = (fieldSchema as Yup.NumberSchema).max(
+              fieldSchema = fieldSchema.max(
                 field.validation.max,
-                field.validation.message ||
-                  `Must be at most ${field.validation.max}`
+                t("validation.max", { max: field.validation.max })
               );
             }
-            break;
-          case "date":
-            fieldSchema = Yup.date();
-            break;
-          case "checkbox":
-            fieldSchema = Yup.array().of(Yup.string());
-            break;
-          case "select":
-          case "radio":
-            fieldSchema = Yup.string();
-            break;
-          default:
-            fieldSchema = Yup.string();
-        }
 
-        // Add required validation if field is required
-        if (field.required) {
-          if (fieldSchema.type === "string") {
-            fieldSchema = (fieldSchema as Yup.StringSchema).required(
-              "This field is required"
-            );
-          } else if (fieldSchema.type === "number") {
-            fieldSchema = (fieldSchema as Yup.NumberSchema).required(
-              "This field is required"
-            );
-          } else if (fieldSchema.type === "date") {
-            fieldSchema = (fieldSchema as Yup.DateSchema).required(
-              "This field is required"
-            );
-          } else if (fieldSchema.type === "array") {
-            // Instead of type casting, modify the schema and assign it back
-            fieldSchema = fieldSchema.required("This field is required");
-            // We need this with a ts-expect-error because Yup typing is complex
-            // @ts-expect-error: min exists on array schema
-            fieldSchema = fieldSchema.min(
-              1,
-              "Please select at least one option"
-            );
-          } else {
-            fieldSchema = fieldSchema.required("This field is required");
+            // Add required validation if specified
+            if (field.required) {
+              fieldSchema = fieldSchema.required(t("validation.required"));
+            }
+
+            schema[field.id] = fieldSchema;
+            break;
+          }
+
+          case "date": {
+            let fieldSchema = Yup.date()
+              .typeError(t("validation.pattern"))
+              .nullable();
+
+            // Add required validation if specified
+            if (field.required) {
+              fieldSchema = fieldSchema.required(t("validation.required"));
+            }
+
+            schema[field.id] = fieldSchema;
+            break;
+          }
+
+          case "checkbox": {
+            let fieldSchema = Yup.array().of(Yup.string());
+
+            // Add required validation if specified
+            if (field.required) {
+              fieldSchema = fieldSchema.required(t("validation.required"));
+              fieldSchema = fieldSchema.min(1, t("validation.required"));
+            }
+
+            schema[field.id] = fieldSchema;
+            break;
+          }
+
+          case "radio":
+          case "select": {
+            let fieldSchema = Yup.string();
+
+            // Add required validation if specified
+            if (field.required) {
+              fieldSchema = fieldSchema.required(t("validation.required"));
+            }
+
+            schema[field.id] = fieldSchema;
+            break;
+          }
+
+          default: {
+            let fieldSchema = Yup.mixed();
+
+            // Add required validation if specified
+            if (field.required) {
+              fieldSchema = fieldSchema.required(t("validation.required"));
+            }
+
+            schema[field.id] = fieldSchema;
           }
         }
-
-        schema[field.id] = fieldSchema;
       }
     });
   };
 
-  // Build validation schema from form structure
+  // Function to create validation schema for fields
   const buildValidationSchema = () => {
-    if (!formStructure || !formStructure.fields) return {};
-
     const schema: Record<string, Yup.Schema> = {};
-    processFields(formStructure.fields, schema);
-    return schema;
+    if (formStructure?.fields) {
+      processFields(formStructure.fields, schema);
+    }
+    setValidationSchema(schema);
   };
 
   useEffect(() => {
     if (formStructure) {
-      setValidationSchema(buildValidationSchema());
+      buildValidationSchema();
     }
   }, [formStructure]);
 
@@ -300,7 +347,7 @@ export const useDynamicForm = ({
         }
         return result;
       } catch (error) {
-        console.error("Form submission error:", error);
+        console.error(t("form.autosaveFailed"), error);
         throw error;
       }
     },

@@ -16,7 +16,9 @@ import {
   useTheme,
 } from "@mui/material";
 import { FC, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useDynamicForm } from "../hooks/useDynamicForm";
+import { useLanguage } from "../hooks/useLanguage";
 import { FormStructure } from "../types/form";
 import { DynamicField } from "./DynamicField";
 
@@ -35,6 +37,8 @@ export const DynamicForm: FC<DynamicFormProps> = ({
   enableAutosave = false,
   draftKey,
 }) => {
+  const { t } = useLanguage();
+  const { t: t_i18n } = useTranslation();
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const theme = useTheme();
@@ -76,7 +80,7 @@ export const DynamicForm: FC<DynamicFormProps> = ({
     try {
       await formik.submitForm();
     } catch (error) {
-      console.error("Form submission error:", error);
+      console.error(t_i18n("form.autosaveFailed"), error);
     } finally {
       setSubmitting(false);
     }
@@ -88,7 +92,7 @@ export const DynamicForm: FC<DynamicFormProps> = ({
   };
 
   const handleClearDraft = () => {
-    if (window.confirm("Are you sure you want to clear your saved draft?")) {
+    if (window.confirm(t("messages.clearDraftConfirmation"))) {
       clearSavedDraft();
       // Reset the form to initial empty values
       formik.resetForm();
@@ -108,28 +112,49 @@ export const DynamicForm: FC<DynamicFormProps> = ({
   if (!formStructure || !formReady) {
     return (
       <Box sx={{ textAlign: "center", p: 4, width: "100%" }}>
-        <Typography variant="body1">No form structure available.</Typography>
+        <Typography variant="body1">{t("form.loading")}</Typography>
       </Box>
     );
   }
+  console.log(formik.isValid);
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
       <Card sx={{ mb: 3, width: "100%" }}>
         <CardContent>
           <Typography variant="h5" component="h2" gutterBottom>
-            {formStructure.title}
+            {t(`form.titles.${formStructure.formId}`, {
+              defaultValue: formStructure.title,
+            })}
           </Typography>
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            Please fill out all required fields below.
+            {t("messages.fillRequired")}
           </Typography>
         </CardContent>
       </Card>
 
-      <Card sx={{ mb: 3, width: "100%" }}>
-        <CardContent>
+      <Card
+        sx={{
+          mb: 3,
+          width: "100%",
+          direction: "ltr",
+          bgcolor: (theme) =>
+            theme.palette.mode === "light" ? "#ffffff" : undefined,
+          boxShadow: (theme) =>
+            theme.palette.mode === "light"
+              ? "0 2px 12px rgba(0, 0, 0, 0.08)"
+              : undefined,
+        }}
+      >
+        <CardContent
+          sx={{
+            width: "100%",
+            direction: "ltr",
+            p: { xs: 2, sm: 3 },
+          }}
+        >
           {visibleFormStructure.fields.map((field, index) => (
-            <Box key={field.id} sx={{ width: "100%" }}>
+            <Box key={field.id} sx={{ width: "100%", direction: "ltr" }}>
               <DynamicField
                 field={field}
                 formik={formik}
@@ -168,14 +193,14 @@ export const DynamicForm: FC<DynamicFormProps> = ({
                   fontSize="small"
                   sx={{ verticalAlign: "middle", mr: 0.5 }}
                 />
-                Last autosaved: {lastSaved.toLocaleTimeString()}
+                {t("form.autosaved")}: {lastSaved.toLocaleTimeString()}
               </Typography>
-              <Tooltip title="Clear saved draft">
+              <Tooltip title={t("form.cancel")}>
                 <IconButton
                   size="small"
                   color="default"
                   onClick={handleClearDraft}
-                  aria-label="Clear draft"
+                  aria-label={t_i18n("form.clearDraft")}
                 >
                   <DeleteIcon fontSize="small" />
                 </IconButton>
@@ -199,7 +224,7 @@ export const DynamicForm: FC<DynamicFormProps> = ({
             disabled={submitting || !formik.isValid || !formik.dirty}
             fullWidth={isMobile}
           >
-            Save Draft
+            {t("form.saveDraft")}
           </Button>
           <Button
             type="submit"
@@ -212,12 +237,12 @@ export const DynamicForm: FC<DynamicFormProps> = ({
             {submitting ? (
               <>
                 <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
-                Submitting...
+                {t("form.submitting")}
               </>
             ) : submitSuccess ? (
-              "Submitted!"
+              t("form.submitted")
             ) : (
-              "Submit Application"
+              t("form.submit")
             )}
           </Button>
         </Box>

@@ -13,6 +13,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { FC, ReactNode, useMemo, useState } from "react";
+import { useLanguage } from "../hooks/useLanguage";
+import { LanguageSelector } from "./LanguageSelector";
 import { NavMenu } from "./NavMenu";
 
 interface LayoutProps {
@@ -22,6 +24,7 @@ interface LayoutProps {
 export const Layout: FC<LayoutProps> = ({ children }) => {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
   const [darkMode, setDarkMode] = useState(prefersDarkMode);
+  const { t, isRTL } = useLanguage();
 
   const theme = useMemo(
     () =>
@@ -52,9 +55,35 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
               },
             },
           },
+          MuiButtonGroup: {
+            styleOverrides: {
+              root: {
+                direction: isRTL ? "rtl" : "ltr",
+              },
+              grouped: {
+                "&:not(:last-of-type)": isRTL
+                  ? {
+                      borderTopLeftRadius: "inherit",
+                      borderBottomLeftRadius: "inherit",
+                      borderTopRightRadius: 0,
+                      borderBottomRightRadius: 0,
+                    }
+                  : {},
+                "&:not(:first-of-type)": isRTL
+                  ? {
+                      borderTopRightRadius: "inherit",
+                      borderBottomRightRadius: "inherit",
+                      borderTopLeftRadius: 0,
+                      borderBottomLeftRadius: 0,
+                    }
+                  : {},
+              },
+            },
+          },
         },
+        direction: isRTL ? "rtl" : "ltr",
       }),
-    [darkMode]
+    [darkMode, isRTL]
   );
 
   const toggleDarkMode = () => {
@@ -81,23 +110,27 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
             }}
           >
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Smart Insurance Portal
+              {t("appName")}
             </Typography>
             <NavMenu />
-            <IconButton color="inherit" onClick={toggleDarkMode}>
-              {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-            </IconButton>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <LanguageSelector />
+              <IconButton color="inherit" onClick={toggleDarkMode}>
+                {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+              </IconButton>
+            </Box>
           </Toolbar>
         </AppBar>
         <Container
           maxWidth={false}
           sx={{
             mt: { xs: 2, sm: 3, md: 4 },
-            mb: { xs: 2, sm: 3, md: 4 },
+            // mb: { xs: 2, sm: 3, md: 4 },
             flex: 1,
             display: "flex",
             flexDirection: "column",
             px: { xs: 2, sm: 3, md: 4 },
+            bgcolor: "background.paper",
           }}
         >
           <Box
@@ -105,6 +138,7 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
               width: "100%",
               maxWidth: { sm: "100%", md: "1200px" },
               mx: "auto",
+              bgcolor: "background.paper",
             }}
           >
             {children}
@@ -121,8 +155,7 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
         >
           <Container maxWidth={false}>
             <Typography variant="body2" color="text.secondary" align="center">
-              © {new Date().getFullYear()} Smart Insurance Portal. All rights
-              reserved.
+              {t("footer.rightsReserved", { year: new Date().getFullYear() })}
             </Typography>
           </Container>
         </Box>

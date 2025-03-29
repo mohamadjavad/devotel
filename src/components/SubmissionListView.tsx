@@ -29,13 +29,15 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { FC, ReactNode, useEffect, useState } from "react";
+
+import { FC, ReactNode, useEffect, useState } from "react";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
 } from "react-beautiful-dnd";
+import { useLanguage } from "../hooks/useLanguage";
 import { useSubmissions } from "../hooks/useSubmissions";
 import { ColumnDefinition, TableData } from "../types/form";
 
@@ -69,6 +71,7 @@ interface SubmissionListViewProps {
 export const SubmissionListView: FC<SubmissionListViewProps> = ({
   initialVisibleColumns,
 }) => {
+  const { t, isRTL } = useLanguage();
   const [visibleColumnIds, setVisibleColumnIds] = useState<string[]>([]);
   const [columnMenuAnchor, setColumnMenuAnchor] = useState<null | HTMLElement>(
     null
@@ -210,7 +213,21 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
     if (column.accessor === "Insurance Type" || column.accessor === "Status") {
       return (
         <Chip
-          label={value}
+          label={
+            value === "Health"
+              ? t("chipLabels.health")
+              : value === "Home"
+              ? t("chipLabels.home")
+              : value === "Car"
+              ? t("chipLabels.car")
+              : value === "Approved"
+              ? t("chipLabels.approved")
+              : value === "Rejected"
+              ? t("chipLabels.rejected")
+              : value === "Pending"
+              ? t("chipLabels.pending")
+              : value
+          }
           color={
             value === "Health"
               ? "info"
@@ -264,11 +281,9 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
   if (error) {
     return (
       <Box sx={{ textAlign: "center", p: 4 }}>
-        <Typography color="error">
-          Error loading submissions. Please try again later.
-        </Typography>
+        <Typography color="error">{t("submissions.error")}</Typography>
         <Button variant="outlined" onClick={() => refetch()} sx={{ mt: 2 }}>
-          Retry
+          {t("submissions.retry")}
         </Button>
       </Box>
     );
@@ -287,29 +302,29 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
             }}
           >
             <Typography variant="h5" component="h2">
-              Submissions
+              {t("submissions.title")}
             </Typography>
             <Box>
               <Button
                 startIcon={<FilterListIcon />}
                 onClick={handleFilterMenuOpen}
-                sx={{ ml: 1 }}
+                sx={{ ml: isRTL ? 0 : 1, mr: isRTL ? 1 : 0 }}
               >
-                Filter
+                {t("submissions.filter")}
               </Button>
               <Button
                 startIcon={<ViewColumnIcon />}
                 onClick={handleColumnMenuOpen}
-                sx={{ ml: 1 }}
+                sx={{ ml: isRTL ? 0 : 1, mr: isRTL ? 1 : 0 }}
               >
-                Columns
+                {t("submissions.columns")}
               </Button>
             </Box>
           </Box>
 
           <Box sx={{ mb: 2 }}>
             <TextField
-              label="Search"
+              label={t("submissions.search")}
               variant="outlined"
               fullWidth
               value={searchText}
@@ -317,8 +332,8 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
               disabled={!filterField}
               placeholder={
                 filterField
-                  ? `Search by ${filterField}...`
-                  : "Select a field to search"
+                  ? t("submissions.searchPlaceholder", { field: filterField })
+                  : t("submissions.selectField")
               }
               InputProps={{
                 startAdornment: (
@@ -329,7 +344,7 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
                 endAdornment: searchText ? (
                   <InputAdornment position="end">
                     <IconButton
-                      aria-label="clear search"
+                      aria-label={t("submissions.clearSearch")}
                       onClick={clearSearch}
                       edge="end"
                     >
@@ -344,7 +359,7 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
           {Object.keys(filter).length > 0 && (
             <Box sx={{ mb: 2 }}>
               <Typography component="span" sx={{ mr: 1 }}>
-                Active filters:
+                {t("submissions.activeFilters")}
               </Typography>
               {Object.entries(filter).map(([key, value]) => (
                 <Chip
@@ -363,7 +378,7 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
                 />
               ))}
               <Chip
-                label="Clear All"
+                label={t("submissions.clearAll")}
                 onDelete={() => {
                   handleFilterChange({});
                   setSearchText("");
@@ -542,6 +557,10 @@ export const SubmissionListView: FC<SubmissionListViewProps> = ({
           page={currentPage - 1} // API pages are 1-indexed, but MUI is 0-indexed
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage={t("tableLabels.itemsPerPage")}
+          labelDisplayedRows={({ from, to, count }) =>
+            `${from}-${to} ${t("tableLabels.of")} ${count}`
+          }
         />
       </Paper>
     </Box>
