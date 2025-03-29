@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import { useDynamicForm } from "../hooks/useDynamicForm";
 import { useLanguage } from "../hooks/useLanguage";
 import { FormStructure } from "../types/form";
+import { ConfirmationDialog } from "./ConfirmationDialog";
 import { DynamicField } from "./DynamicField";
 
 interface DynamicFormProps {
@@ -45,6 +46,8 @@ export const DynamicForm: FC<DynamicFormProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
+  const [showClearDraftConfirmation, setShowClearDraftConfirmation] =
+    useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -120,11 +123,18 @@ export const DynamicForm: FC<DynamicFormProps> = ({
   };
 
   const handleClearDraft = () => {
-    if (window.confirm(t("messages.clearDraftConfirmation"))) {
-      clearSavedDraft();
-      // Reset the form to initial empty values
-      formik.resetForm();
-    }
+    setShowClearDraftConfirmation(true);
+  };
+
+  const handleConfirmClearDraft = () => {
+    clearSavedDraft();
+    // Reset the form to initial empty values
+    formik.resetForm();
+    setShowClearDraftConfirmation(false);
+  };
+
+  const handleCancelClearDraft = () => {
+    setShowClearDraftConfirmation(false);
   };
 
   if (isLoading) {
@@ -211,7 +221,6 @@ export const DynamicForm: FC<DynamicFormProps> = ({
         sx={{
           mt: 3,
           mb: 3,
-
           width: "100%",
         }}
       >
@@ -233,7 +242,7 @@ export const DynamicForm: FC<DynamicFormProps> = ({
                   />
                   {t("form.autosaved")}: {lastSaved.toLocaleTimeString()}
                 </Typography>
-                <Tooltip title={t("form.cancel")}>
+                <Tooltip title={t("form.clearDraft")}>
                   <IconButton
                     size="small"
                     color="default"
@@ -286,6 +295,15 @@ export const DynamicForm: FC<DynamicFormProps> = ({
           </Box>
         </CardContent>
       </Card>
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        open={showClearDraftConfirmation}
+        title={t("form.clearDraft")}
+        message={t("messages.clearDraftConfirmation")}
+        onConfirm={handleConfirmClearDraft}
+        onCancel={handleCancelClearDraft}
+      />
     </Box>
   );
 };
